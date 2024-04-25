@@ -18,7 +18,7 @@ from datetime import datetime, timedelta
 # client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 
 # Set page configuration to wide mode and set page title
-st.set_page_config(layout="wide", page_title="Vehicle Telematics Dashboard")
+st.set_page_config(layout="wide", page_title="Inventory Dashboard")
 
 # Mapbox Access Token
 # Set Mapbox access token
