@@ -70,12 +70,6 @@ def main():
             'Count': [rev_gen_count, non_rev_gen_count, total_count]
         })
 
-        # Display the %Utilization scorecard
-        st.write("## %Utilization Scorecard")
-        st.write(f"%Utilization: {utilization_percentage:.2f}%")
-        st.write("### Revenue Generation and Non-Revenue Generation Counts")
-        st.write(df_counts)
-
         # Fetch data from 'odoo_inventory' table for 'partner_id'
         data_partner_id = fetch_data_from_supabase('partner_id', battery_capacity)
 
@@ -109,8 +103,15 @@ def main():
                 plt.rcParams['font.size'] = 12  # Adjust font size of labels
                 st.pyplot(fig_partner_id)
 
+        # Display the %Utilization scorecard
+        st.write("## %Utilization Scorecard")
+        st.write(f"%Utilization: {utilization_percentage:.2f}%")
+        st.write("### Revenue Generation and Non-Revenue Generation Counts")
+        st.write(df_counts)
+
 if __name__ == "__main__":
     main()
+
 
 
 
