@@ -42,6 +42,7 @@ def main():
             fig, ax = plt.subplots(figsize=(8, 6))  # Adjust the figure size here
             ax.pie(ops_status_counts, labels=ops_status_counts.index, autopct='%1.1f%%', startangle=90)
             ax.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+            plt.tight_layout()  # Adjust layout to prevent label overlap
             st.pyplot(fig)
 
 if __name__ == "__main__":
