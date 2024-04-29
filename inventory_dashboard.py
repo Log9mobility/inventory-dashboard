@@ -44,7 +44,7 @@ def main():
             # Position the pie chart for 'ops_status' in the first column
             with col1:
                 st.write("## Ops Status Pie Chart")
-                fig_ops_status, ax_ops_status = plt.subplots(figsize=(12, 10))
+                fig_ops_status, ax_ops_status = plt.subplots(figsize=(10, 8))
                 ax_ops_status.pie(ops_status_counts, labels=None, autopct='%1.1f%%', startangle=90)
                 ax_ops_status.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
                 plt.legend(ops_status_counts.index, loc="upper left", bbox_to_anchor=(1, 0.7))  # Place labels as legends
