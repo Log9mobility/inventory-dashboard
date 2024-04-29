@@ -1,4 +1,4 @@
-import streamlit as st
+yimport streamlit as st
 import psycopg2
 import pandas as pd
 from streamlit_echarts import st_echarts
@@ -18,7 +18,7 @@ from datetime import datetime, timedelta
 # client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 
 # Set page configuration to wide mode and set page title
-st.set_page_config(layout="wide", page_title="Vehicle Telematics Dashboard")
+st.set_page_config(layout="wide", page_title="Inventory Dashboard")
 
 # Mapbox Access Token
 # Set Mapbox access token
@@ -35,6 +35,14 @@ def get_data():
         host='aws-0-ap-south-1.pooler.supabase.com',
         port='5432'
     )
+    cursor = conn.cursor()
+        cursor.execute("SELECT ops_status FROM odoo_inventory")
+        data = cursor.fetchall()
+        conn.close()
+        return [item[0] for item in data]
+    except psycopg2.Error as e:
+        st.error(f"Error connecting to Supabase: {e}")
+        return None
         
 # Main function to create the pie chart
 def main():
