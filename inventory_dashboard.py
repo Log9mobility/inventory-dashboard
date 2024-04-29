@@ -50,24 +50,28 @@ def fetch_distinct_battery_capacities():
 def main():
     # Battery capacity filter
     distinct_battery_capacities = fetch_distinct_battery_capacities()
-    battery_capacity = st.sidebar.multiselect('Battery Capacity', distinct_battery_capacities + ['All'])
+    battery_capacity = st.sidebar.selectbox('Select Battery Capacity', distinct_battery_capacities + ['All'])
 
     # Fetch data from 'odoo_inventory' table for 'ops_status' with optional battery capacity filter
-    data_ops_status = fetch_data_from_supabase('ops_status', battery_capacity if 'All' not in battery_capacity else None)
+    data_ops_status = fetch_data_from_supabase('ops_status', battery_capacity)
 
     if data_ops_status is not None:
         # Count occurrences of each ops status
         ops_status_counts = pd.Series(data_ops_status).value_counts()
 
         # Calculate counts for 'rev gen' and 'non rev gen'
-        rev_gen_count = ops_status_counts[['RENTAL', 'PORTER']].sum()
+        try:
+            rev_gen_count = ops_status_counts[['RENTAL', 'PORTER']].sum()
+        except KeyError:
+            # Handle the case when 'RENTAL' and 'PORTER' are not present in ops_status_counts
+            rev_gen_count = 0
         non_rev_gen_count = ops_status_counts.drop(['RENTAL', 'PORTER'], errors='ignore').sum()
 
         # Calculate total
         total_count = rev_gen_count + non_rev_gen_count
 
-        # Fetch data from 'odoo_inventory' table for 'partner_id' with optional battery capacity filter
-        data_partner_id = fetch_data_from_supabase('partner_id', battery_capacity if 'All' not in battery_capacity else None)
+        # Fetch data from 'odoo_inventory' table for 'partner_id'
+        data_partner_id = fetch_data_from_supabase('partner_id', battery_capacity)
 
         if data_partner_id is not None:
             # Count occurrences of each partner_id and select top 10
@@ -107,4 +111,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
