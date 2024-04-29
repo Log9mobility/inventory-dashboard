@@ -64,17 +64,15 @@ def main():
         # Calculate %Utilization using existing counts
         utilization_percentage = (rev_gen_count / total_count) * 100
 
-        # Display the %Utilization scorecard
-        st.write("## %Utilization Scorecard")
-        st.write(f"%Utilization: {utilization_percentage:.2f}%")
-
         # Create DataFrame for rev_gen, non_rev_gen, and total counts
         df_counts = pd.DataFrame({
             'Category': ['Rev Gen', 'Non Rev Gen', 'Total'],
             'Count': [rev_gen_count, non_rev_gen_count, total_count]
         })
 
-        # Display the DataFrame
+        # Display the %Utilization scorecard
+        st.write("## %Utilization Scorecard")
+        st.write(f"%Utilization: {utilization_percentage:.2f}%")
         st.write("### Revenue Generation and Non-Revenue Generation Counts")
         st.write(df_counts)
 
@@ -113,6 +111,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
