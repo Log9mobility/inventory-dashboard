@@ -15,6 +15,8 @@ def fetch_data_from_supabase(column_name, battery_capacity=None):
         )
         cursor = conn.cursor()
         if battery_capacity and battery_capacity != 'All':
+            # Convert battery_capacity to string if it's not 'All'
+            battery_capacity = str(battery_capacity)
             cursor.execute(f"SELECT {column_name} FROM odoo_inventory WHERE battery_capacity = %s", (battery_capacity,))
         else:
             cursor.execute(f"SELECT {column_name} FROM odoo_inventory")
@@ -105,5 +107,4 @@ def main():
 
 if __name__ == "__main__":
     main()
-
 
