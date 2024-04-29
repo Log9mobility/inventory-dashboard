@@ -66,6 +66,17 @@ def main():
 
         # Display the %Utilization scorecard
         st.write("## %Utilization Scorecard")
+        st.write(f"%Utilization: {utilization_percentage:.2f}%")
+
+        # Create DataFrame for rev_gen, non_rev_gen, and total counts
+        df_counts = pd.DataFrame({
+            'Category': ['Rev Gen', 'Non Rev Gen', 'Total'],
+            'Count': [rev_gen_count, non_rev_gen_count, total_count]
+        })
+
+        # Display the DataFrame
+        st.write("### Revenue Generation and Non-Revenue Generation Counts")
+        st.write(df_counts)
 
         # Fetch data from 'odoo_inventory' table for 'partner_id'
         data_partner_id = fetch_data_from_supabase('partner_id', battery_capacity)
@@ -88,13 +99,6 @@ def main():
                 plt.tight_layout()  # Adjust layout to prevent label overlap
                 plt.rcParams['font.size'] = 12  # Adjust font size of labels
                 st.pyplot(fig_ops_status)
-
-                # Display rev gen, non rev gen, and total counts
-                st.write("### Revenue Generation and Non-Revenue Generation Counts")
-                st.write(pd.DataFrame({
-                    'Category': ['Rev Gen', 'Non Rev Gen', 'Total'],
-                    'Count': [rev_gen_count, non_rev_gen_count, total_count]
-                }))
 
             # Position the pie chart for 'partner_id' in the second column
             with col2:
