@@ -58,7 +58,6 @@ def main():
     if data_ops_status is not None:
         # Calculate counts for 'rev gen' and 'non rev gen'
         rev_gen_count = sum(1 for status in data_ops_status if status in ['RENTAL', 'PORTER'])
-        non_rev_gen_count = len(data_ops_status) - rev_gen_count
         total_count = len(data_ops_status)
 
         # Calculate %Utilization using existing counts
@@ -66,10 +65,6 @@ def main():
 
         # Display the %Utilization scorecard
         st.write("## %Utilization Scorecard")
-        st.write(f"Total Ops Status Count: {total_count}")
-        st.write(f"Total Rental and Porter Count: {rev_gen_count}")
-        st.write(f"Total Non-Rental and Non-Porter Count: {non_rev_gen_count}")
-        st.write(f"Total: {total_count}")
         st.write(f"%Utilization: {utilization_percentage:.2f}%")
 
         # Fetch data from 'odoo_inventory' table for 'partner_id'
@@ -94,13 +89,6 @@ def main():
                 plt.rcParams['font.size'] = 12  # Adjust font size of labels
                 st.pyplot(fig_ops_status)
 
-                # Display rev gen, non rev gen, and total counts
-                st.write("### Revenue Generation and Non-Revenue Generation Counts")
-                st.write(pd.DataFrame({
-                    'Category': ['Rev Gen', 'Non Rev Gen', 'Total'],
-                    'Count': [rev_gen_count, non_rev_gen_count, total_count]
-                }))
-
             # Position the pie chart for 'partner_id' in the second column
             with col2:
                 st.write("## Top 10 Partner ID Pie Chart")
@@ -114,5 +102,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
