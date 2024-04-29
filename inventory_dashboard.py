@@ -33,12 +33,16 @@ def main():
         # Count occurrences of each ops status
         ops_status_counts = pd.Series(data).value_counts()
 
-        # Create a pie chart
-        fig, ax = plt.subplots(figsize=(4, 3))
-        ax.pie(ops_status_counts, labels=ops_status_counts.index, autopct='%1.1f%%', startangle=90)
-        ax.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
-        st.pyplot(fig)
+        # Create columns to layout the chart
+        col1, col2 = st.columns([1, 1])  # Divide the page into two columns
+
+        # Position the pie chart in the second half, right side of the page
+        with col2:
+            st.write("## Ops Status Pie Chart")
+            fig, ax = plt.subplots(figsize=(8, 6))  # Adjust the figure size here
+            ax.pie(ops_status_counts, labels=ops_status_counts.index, autopct='%1.1f%%', startangle=90)
+            ax.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+            st.pyplot(fig)
 
 if __name__ == "__main__":
     main()
-
