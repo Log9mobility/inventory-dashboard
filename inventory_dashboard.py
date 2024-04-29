@@ -24,8 +24,6 @@ def fetch_data_from_supabase(column_name):
 
 # Main function to create the pie charts
 def main():
-    st.title("Pie Charts from Odoo Inventory")
-
     # Fetch data from 'odoo_inventory' table for 'ops_status'
     data_ops_status = fetch_data_from_supabase('ops_status')
 
@@ -47,8 +45,9 @@ def main():
             with col1:
                 st.write("## Ops Status Pie Chart")
                 fig_ops_status, ax_ops_status = plt.subplots(figsize=(8, 6))
-                ax_ops_status.pie(ops_status_counts, labels=ops_status_counts.index, autopct='%1.1f%%', startangle=90)
+                ax_ops_status.pie(ops_status_counts, labels=None, autopct='%1.1f%%', startangle=90)
                 ax_ops_status.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+                plt.legend(ops_status_counts.index, loc="upper left")  # Place labels as legends
                 plt.tight_layout()  # Adjust layout to prevent label overlap
                 plt.rcParams['font.size'] = 12  # Adjust font size of labels
                 st.pyplot(fig_ops_status)
@@ -57,12 +56,12 @@ def main():
             with col2:
                 st.write("## Top 10 Partner ID Pie Chart")
                 fig_partner_id, ax_partner_id = plt.subplots(figsize=(8, 6))
-                ax_partner_id.pie(partner_id_counts, labels=partner_id_counts.index, autopct='%1.1f%%', startangle=90)
+                ax_partner_id.pie(partner_id_counts, labels=None, autopct='%1.1f%%', startangle=90)
                 ax_partner_id.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+                plt.legend(partner_id_counts.index, loc="upper left")  # Place labels as legends
                 plt.tight_layout()  # Adjust layout to prevent label overlap
                 plt.rcParams['font.size'] = 12  # Adjust font size of labels
                 st.pyplot(fig_partner_id)
 
 if __name__ == "__main__":
     main()
-
