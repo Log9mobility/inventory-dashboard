@@ -28,7 +28,7 @@ def fetch_data_from_supabase(column_name, battery_capacity=None):
 # Main function to create the pie charts and calculate rev gen, non rev gen, and total
 def main():
     # Battery capacity filter
-    battery_capacity = st.sidebar.selectbox('Select Battery Capacity', ['All', 2000, 3000, 4000, 5000])
+    battery_capacity = st.sidebar.selectbox('Select Battery Capacity', ['All', '2 KW', '7.7Kw', '5.8Kw', 'Other'])
 
     # Fetch data from 'odoo_inventory' table for 'ops_status' with optional battery capacity filter
     data_ops_status = fetch_data_from_supabase('ops_status', battery_capacity if battery_capacity != 'All' else None)
