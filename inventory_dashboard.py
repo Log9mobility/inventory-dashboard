@@ -18,8 +18,9 @@ def fetch_data_from_supabase(column_name, battery_capacity=None, deployed_city=N
         if battery_capacity and 'All' not in battery_capacity:
             battery_capacity = tuple(map(str, battery_capacity))
             query += f" AND battery_capacity IN {battery_capacity}"
-        if deployed_city:
-            query += f" AND deployed_city IN {tuple(deployed_city)}"
+        if deployed_city and 'All' not in deployed_city:
+            deployed_city = tuple(map(str, deployed_city))
+            query += f" AND deployed_city IN {deployed_city}"
         cursor.execute(query)
         data = cursor.fetchall()
         conn.close()
@@ -55,7 +56,7 @@ def main():
 
     # Deployed city filter
     distinct_cities = fetch_distinct_values('deployed_city')
-    selected_cities = st.sidebar.multiselect('Select Deployed Cities', distinct_cities)
+    selected_cities = st.sidebar.multiselect('Select Deployed Cities', distinct_cities + ['All'])
 
     # Fetch data from 'odoo_inventory' table for 'ops_status' with optional filters
     data_ops_status = fetch_data_from_supabase('ops_status', battery_capacity, selected_cities)
