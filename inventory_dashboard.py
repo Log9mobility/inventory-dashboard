@@ -44,7 +44,7 @@ def main():
             # Position the pie chart for 'ops_status' in the first column
             with col1:
                 st.write("## Ops Status Pie Chart")
-                fig_ops_status, ax_ops_status = plt.subplots(figsize=(8, 6))
+                fig_ops_status, ax_ops_status = plt.subplots(figsize=(12, 10))
                 ax_ops_status.pie(ops_status_counts, labels=None, autopct='%1.1f%%', startangle=90)
                 ax_ops_status.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
                 plt.legend(ops_status_counts.index, loc="upper left", bbox_to_anchor=(1, 0.5))  # Place labels as legends
@@ -55,7 +55,7 @@ def main():
             # Position the pie chart for 'partner_id' in the second column
             with col2:
                 st.write("## Top 10 Partner ID Pie Chart")
-                fig_partner_id, ax_partner_id = plt.subplots(figsize=(8, 6))
+                fig_partner_id, ax_partner_id = plt.subplots(figsize=(12, 10))
                 ax_partner_id.pie(partner_id_counts, labels=None, autopct='%1.1f%%', startangle=90)
                 ax_partner_id.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
                 plt.legend(partner_id_counts.index, loc="upper left", bbox_to_anchor=(1, 0.5))  # Place labels as legends
