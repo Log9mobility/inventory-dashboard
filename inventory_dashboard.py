@@ -14,7 +14,7 @@ def fetch_data_from_supabase(column_name, battery_capacity=None):
             port='5432'
         )
         cursor = conn.cursor()
-        if battery_capacity:
+        if battery_capacity and battery_capacity != 'All':
             cursor.execute(f"SELECT {column_name} FROM odoo_inventory WHERE battery_capacity = %s", (battery_capacity,))
         else:
             cursor.execute(f"SELECT {column_name} FROM odoo_inventory")
@@ -25,13 +25,33 @@ def fetch_data_from_supabase(column_name, battery_capacity=None):
         st.error(f"Error connecting to Supabase: {e}")
         return None
 
+# Function to fetch distinct battery capacities from Supabase table
+def fetch_distinct_battery_capacities():
+    try:
+        conn = psycopg2.connect(
+            database="postgres",
+            user='postgres.gqmpfexjoachyjgzkhdf',
+            password='Change@2015Log9',
+            host='aws-0-ap-south-1.pooler.supabase.com',
+            port='5432'
+        )
+        cursor = conn.cursor()
+        cursor.execute("SELECT DISTINCT battery_capacity FROM odoo_inventory")
+        data = cursor.fetchall()
+        conn.close()
+        return [item[0] for item in data]
+    except psycopg2.Error as e:
+        st.error(f"Error connecting to Supabase: {e}")
+        return None
+
 # Main function to create the pie charts and calculate rev gen, non rev gen, and total
 def main():
     # Battery capacity filter
-    battery_capacity = st.sidebar.multiselect('Select Battery Capacity', ['All', '2 KW', '7.7Kw', '5.8Kw', 'Other'])
+    distinct_battery_capacities = fetch_distinct_battery_capacities()
+    battery_capacity = st.sidebar.multiselect('Select Battery Capacity', distinct_battery_capacities + ['All'])
 
     # Fetch data from 'odoo_inventory' table for 'ops_status' with optional battery capacity filter
-    data_ops_status = fetch_data_from_supabase('ops_status', battery_capacity if battery_capacity != 'All' else None)
+    data_ops_status = fetch_data_from_supabase('ops_status', battery_capacity if 'All' not in battery_capacity else None)
 
     if data_ops_status is not None:
         # Count occurrences of each ops status
@@ -45,7 +65,7 @@ def main():
         total_count = rev_gen_count + non_rev_gen_count
 
         # Fetch data from 'odoo_inventory' table for 'partner_id' with optional battery capacity filter
-        data_partner_id = fetch_data_from_supabase('partner_id', battery_capacity if battery_capacity != 'All' else None)
+        data_partner_id = fetch_data_from_supabase('partner_id', battery_capacity if 'All' not in battery_capacity else None)
 
         if data_partner_id is not None:
             # Count occurrences of each partner_id and select top 10
@@ -85,4 +105,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
