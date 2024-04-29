@@ -15,8 +15,8 @@ def fetch_data_from_supabase(column_name, battery_capacity=None):
         )
         cursor = conn.cursor()
         if battery_capacity and battery_capacity != 'All':
-            # Convert battery_capacity to string if it's not 'All'
-            battery_capacity = str(battery_capacity)
+            # Convert battery_capacity to tuple if it's not 'All'
+            battery_capacity = tuple(map(str, battery_capacity))
             cursor.execute(f"SELECT {column_name} FROM odoo_inventory WHERE battery_capacity = %s", (battery_capacity,))
         else:
             cursor.execute(f"SELECT {column_name} FROM odoo_inventory")
@@ -50,7 +50,7 @@ def fetch_distinct_battery_capacities():
 def main():
     # Battery capacity filter
     distinct_battery_capacities = fetch_distinct_battery_capacities()
-    battery_capacity = st.sidebar.selectbox('Select Battery Capacity', distinct_battery_capacities + ['All'])
+    battery_capacity = st.sidebar.multiselect('Select Battery Capacity', distinct_battery_capacities + ['All'])
 
     # Fetch data from 'odoo_inventory' table for 'ops_status' with optional battery capacity filter
     data_ops_status = fetch_data_from_supabase('ops_status', battery_capacity)
