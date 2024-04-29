@@ -22,7 +22,7 @@ def fetch_data_from_supabase(column_name):
         st.error(f"Error connecting to Supabase: {e}")
         return None
 
-# Main function to create the pie charts
+# Main function to create the pie charts and calculate rev gen, non rev gen, and total
 def main():
     # Fetch data from 'odoo_inventory' table for 'ops_status'
     data_ops_status = fetch_data_from_supabase('ops_status')
@@ -30,6 +30,13 @@ def main():
     if data_ops_status is not None:
         # Count occurrences of each ops status
         ops_status_counts = pd.Series(data_ops_status).value_counts()
+
+        # Calculate counts for 'rev gen' and 'non rev gen'
+        rev_gen_count = ops_status_counts[['RENTAL', 'PORTER']].sum()
+        non_rev_gen_count = ops_status_counts.drop(['RENTAL', 'PORTER'], errors='ignore').sum()
+
+        # Calculate total
+        total_count = rev_gen_count + non_rev_gen_count
 
         # Fetch data from 'odoo_inventory' table for 'partner_id'
         data_partner_id = fetch_data_from_supabase('partner_id')
@@ -47,21 +54,29 @@ def main():
                 fig_ops_status, ax_ops_status = plt.subplots(figsize=(10, 8))
                 ax_ops_status.pie(ops_status_counts, labels=None, autopct='%1.1f%%', startangle=90)
                 ax_ops_status.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
-                plt.legend(ops_status_counts.index, loc="upper left", bbox_to_anchor=(1, 0.7))  # Place labels as legends
+                plt.legend(ops_status_counts.index, loc="upper left", bbox_to_anchor=(1, 0.5))  # Place labels as legends and shift upwards
                 plt.tight_layout()  # Adjust layout to prevent label overlap
                 plt.rcParams['font.size'] = 12  # Adjust font size of labels
                 st.pyplot(fig_ops_status)
 
+                # Display rev gen, non rev gen, and total counts
+                st.write("### Revenue Generation and Non-Revenue Generation Counts")
+                st.write(pd.DataFrame({
+                    'Category': ['Rev Gen', 'Non Rev Gen', 'Total'],
+                    'Count': [rev_gen_count, non_rev_gen_count, total_count]
+                }))
+
             # Position the pie chart for 'partner_id' in the second column
             with col2:
                 st.write("## Top 10 Partner ID Pie Chart")
-                fig_partner_id, ax_partner_id = plt.subplots(figsize=(12, 10))
+                fig_partner_id, ax_partner_id = plt.subplots(figsize=(10, 8))
                 ax_partner_id.pie(partner_id_counts, labels=None, autopct='%1.1f%%', startangle=90)
                 ax_partner_id.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
-                plt.legend(partner_id_counts.index, loc="upper left", bbox_to_anchor=(1, 0.7))  # Place labels as legends
+                plt.legend(partner_id_counts.index, loc="upper left", bbox_to_anchor=(1, 0.5))  # Place labels as legends and shift upwards
                 plt.tight_layout()  # Adjust layout to prevent label overlap
                 plt.rcParams['font.size'] = 12  # Adjust font size of labels
                 st.pyplot(fig_partner_id)
 
 if __name__ == "__main__":
     main()
+
