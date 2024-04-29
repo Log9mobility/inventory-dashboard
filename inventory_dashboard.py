@@ -47,7 +47,7 @@ def main():
                 fig_ops_status, ax_ops_status = plt.subplots(figsize=(12, 10))
                 ax_ops_status.pie(ops_status_counts, labels=None, autopct='%1.1f%%', startangle=90)
                 ax_ops_status.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
-                plt.legend(ops_status_counts.index, loc="upper left", bbox_to_anchor=(0.5, 0.5))  # Place labels as legends
+                plt.legend(ops_status_counts.index, loc="upper left", bbox_to_anchor=(1, 1))  # Place labels as legends
                 plt.tight_layout()  # Adjust layout to prevent label overlap
                 plt.rcParams['font.size'] = 12  # Adjust font size of labels
                 st.pyplot(fig_ops_status)
