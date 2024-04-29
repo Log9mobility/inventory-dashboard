@@ -4,7 +4,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 # Function to fetch data from Supabase table
-def fetch_data_from_supabase(column_name):
+def fetch_data_from_supabase(column_name, battery_capacity=None):
     try:
         conn = psycopg2.connect(
             database="postgres",
@@ -14,7 +14,10 @@ def fetch_data_from_supabase(column_name):
             port='5432'
         )
         cursor = conn.cursor()
-        cursor.execute(f"SELECT {column_name} FROM odoo_inventory")
+        if battery_capacity:
+            cursor.execute(f"SELECT {column_name} FROM odoo_inventory WHERE battery_capacity = %s", (battery_capacity,))
+        else:
+            cursor.execute(f"SELECT {column_name} FROM odoo_inventory")
         data = cursor.fetchall()
         conn.close()
         return [item[0] for item in data]
@@ -24,8 +27,11 @@ def fetch_data_from_supabase(column_name):
 
 # Main function to create the pie charts and calculate rev gen, non rev gen, and total
 def main():
-    # Fetch data from 'odoo_inventory' table for 'ops_status'
-    data_ops_status = fetch_data_from_supabase('ops_status')
+    # Battery capacity filter
+    battery_capacity = st.sidebar.selectbox('Select Battery Capacity', ['All', 2000, 3000, 4000, 5000])
+
+    # Fetch data from 'odoo_inventory' table for 'ops_status' with optional battery capacity filter
+    data_ops_status = fetch_data_from_supabase('ops_status', battery_capacity if battery_capacity != 'All' else None)
 
     if data_ops_status is not None:
         # Count occurrences of each ops status
@@ -38,8 +44,8 @@ def main():
         # Calculate total
         total_count = rev_gen_count + non_rev_gen_count
 
-        # Fetch data from 'odoo_inventory' table for 'partner_id'
-        data_partner_id = fetch_data_from_supabase('partner_id')
+        # Fetch data from 'odoo_inventory' table for 'partner_id' with optional battery capacity filter
+        data_partner_id = fetch_data_from_supabase('partner_id', battery_capacity if battery_capacity != 'All' else None)
 
         if data_partner_id is not None:
             # Count occurrences of each partner_id and select top 10
