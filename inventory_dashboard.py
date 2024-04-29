@@ -14,7 +14,7 @@ def fetch_data_from_supabase(column_name):
             port='5432'
         )
         cursor = conn.cursor()
-        cursor.execute("SELECT partner_id FROM odoo_inventory")
+        cursor.execute(f"SELECT {column_name} FROM odoo_inventory")
         data = cursor.fetchall()
         conn.close()
         return [item[0] for item in data]
