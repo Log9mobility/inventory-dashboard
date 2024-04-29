@@ -22,7 +22,7 @@ def fetch_data_from_supabase(column_name):
         st.error(f"Error connecting to Supabase: {e}")
         return None
 
-# Main function to create the pie chart
+# Main function to create the pie charts
 def main():
     st.title("Pie Charts from Odoo Inventory")
 
@@ -33,30 +33,35 @@ def main():
         # Count occurrences of each ops status
         ops_status_counts = pd.Series(data_ops_status).value_counts()
 
-        # Position the pie chart for 'ops_status' in the first half, left side of the page
-        st.write("## Ops Status Pie Chart")
-        fig_ops_status, ax_ops_status = plt.subplots(figsize=(8, 6))
-        ax_ops_status.pie(ops_status_counts, labels=ops_status_counts.index, autopct='%1.1f%%', startangle=90)
-        ax_ops_status.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
-        plt.tight_layout()  # Adjust layout to prevent label overlap
-        plt.rcParams['font.size'] = 12  # Adjust font size of labels
-        st.pyplot(fig_ops_status)
+        # Fetch data from 'odoo_inventory' table for 'partner_id'
+        data_partner_id = fetch_data_from_supabase('partner_id')
 
-    # Fetch top 10 partner IDs from 'odoo_inventory' table
-    data_partner_id = fetch_data_from_supabase('partner_id')
+        if data_partner_id is not None:
+            # Count occurrences of each partner_id and select top 10
+            partner_id_counts = pd.Series(data_partner_id).value_counts().head(10)
 
-    if data_partner_id is not None:
-        # Count occurrences of each partner_id
-        partner_id_counts = pd.Series(data_partner_id).value_counts().head(10)
+            # Create columns to layout the charts
+            col1, col2 = st.columns([1, 1])
 
-        # Position the pie chart for 'partner_id' in the second half, right side of the page
-        st.write("## Top 10 Partner ID Pie Chart")
-        fig_partner_id, ax_partner_id = plt.subplots(figsize=(8, 6))
-        ax_partner_id.pie(partner_id_counts, labels=partner_id_counts.index, autopct='%1.1f%%', startangle=90)
-        ax_partner_id.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
-        plt.tight_layout()  # Adjust layout to prevent label overlap
-        plt.rcParams['font.size'] = 12  # Adjust font size of labels
-        st.pyplot(fig_partner_id)
+            # Position the pie chart for 'ops_status' in the first column
+            with col1:
+                st.write("## Ops Status Pie Chart")
+                fig_ops_status, ax_ops_status = plt.subplots(figsize=(8, 6))
+                ax_ops_status.pie(ops_status_counts, labels=ops_status_counts.index, autopct='%1.1f%%', startangle=90)
+                ax_ops_status.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+                plt.tight_layout()  # Adjust layout to prevent label overlap
+                plt.rcParams['font.size'] = 12  # Adjust font size of labels
+                st.pyplot(fig_ops_status)
+
+            # Position the pie chart for 'partner_id' in the second column
+            with col2:
+                st.write("## Top 10 Partner ID Pie Chart")
+                fig_partner_id, ax_partner_id = plt.subplots(figsize=(8, 6))
+                ax_partner_id.pie(partner_id_counts, labels=partner_id_counts.index, autopct='%1.1f%%', startangle=90)
+                ax_partner_id.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+                plt.tight_layout()  # Adjust layout to prevent label overlap
+                plt.rcParams['font.size'] = 12  # Adjust font size of labels
+                st.pyplot(fig_partner_id)
 
 if __name__ == "__main__":
     main()
