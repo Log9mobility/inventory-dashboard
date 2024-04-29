@@ -1,4 +1,4 @@
-yimport streamlit as st
+import streamlit as st
 import psycopg2
 import pandas as pd
 from streamlit_echarts import st_echarts
