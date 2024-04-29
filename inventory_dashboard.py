@@ -1,4 +1,3 @@
-pip install streamlit matplotlib
 import streamlit as st
 import matplotlib.pyplot as plt
 def main():
