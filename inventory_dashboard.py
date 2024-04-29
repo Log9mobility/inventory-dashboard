@@ -50,7 +50,7 @@ def fetch_distinct_battery_capacities():
 def main():
     # Battery capacity filter
     distinct_battery_capacities = fetch_distinct_battery_capacities()
-    battery_capacity = st.sidebar.multiselect('Select Battery Capacity', distinct_battery_capacities + ['All'])
+    battery_capacity = st.sidebar.multiselect('Battery Capacity', distinct_battery_capacities + ['All'])
 
     # Fetch data from 'odoo_inventory' table for 'ops_status' with optional battery capacity filter
     data_ops_status = fetch_data_from_supabase('ops_status', battery_capacity if 'All' not in battery_capacity else None)
