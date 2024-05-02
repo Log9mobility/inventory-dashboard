@@ -53,7 +53,6 @@ def fetch_distinct_values(column_name):
         st.error(f"Error connecting to Supabase: {e}")
         return None
 
-# Main function to create the scorecard chart and other visualizations
 def main():
     # Universal filters
     distinct_battery_capacities = fetch_distinct_values('battery_capacity')
@@ -119,7 +118,11 @@ def main():
         st.write("### Revenue Generation and Non-Revenue Generation Counts")
         st.write(df_counts)
 
+        # Display the table showing the count of various 'ops_status' across all 'deployed_city'
+        st.write("## Ops Status Counts by Deployed City")
+        ops_status_counts_by_city = pd.Series(data_ops_status).value_counts().reset_index()
+        ops_status_counts_by_city.columns = ['Ops Status', 'Count']
+        st.write(ops_status_counts_by_city)
+
 if __name__ == "__main__":
     main()
-
-
