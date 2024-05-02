@@ -15,10 +15,17 @@ def fetch_data_from_supabase(column_name, battery_capacity=None, deployed_city=N
         )
         cursor = conn.cursor()
         query = f"SELECT {column_name} FROM odoo_inventory WHERE 1=1"
-        if battery_capacity and battery_capacity != 'All':
-            query += f" AND battery_capacity = '{battery_capacity}'"
+        if battery_capacity:
+            if len(battery_capacity) == 1:  # Handle single value case
+                query += f" AND battery_capacity = '{battery_capacity[0]}'"
+            else:
+                battery_capacity = tuple(map(str, battery_capacity))
+                query += f" AND battery_capacity IN {battery_capacity}"
         if deployed_city:
-            query += f" AND TRIM(deployed_city) IN ({', '.join([f'\'{city.strip()}\' ' for city in deployed_city])})"
+            if len(deployed_city) == 1:  # Handle single value case
+                query += f" AND deployed_city = '{deployed_city[0]}'"
+            else:
+                query += f" AND deployed_city IN {tuple(deployed_city)}"
         cursor.execute(query)
         data = cursor.fetchall()
         conn.close()
@@ -46,14 +53,14 @@ def fetch_distinct_values(column_name):
         st.error(f"Error connecting to Supabase: {e}")
         return None
 
+# Main function to create the scorecard chart and other visualizations
 def main():
-    # New filter for 'Battery Capacity'
-    battery_capacity_options = ['All'] + fetch_distinct_values('battery_capacity')
-    battery_capacity = st.sidebar.selectbox('Select Battery Capacity', battery_capacity_options)
+    # Universal filters
+    distinct_battery_capacities = fetch_distinct_values('battery_capacity')
+    battery_capacity = st.sidebar.multiselect('Select Battery Capacity', distinct_battery_capacities + ['All'])
 
-    # New filter for 'Deployed City'
-    deployed_city_options = ['All'] + fetch_distinct_values('deployed_city')
-    selected_cities = st.sidebar.multiselect('Select Deployed City', deployed_city_options)
+    distinct_cities = fetch_distinct_values('deployed_city')
+    selected_cities = st.sidebar.multiselect('Select Deployed Cities', distinct_cities)
 
     # Fetch data from 'odoo_inventory' table for 'ops_status' with optional filters
     data_ops_status = fetch_data_from_supabase('ops_status', battery_capacity, selected_cities)
@@ -65,22 +72,13 @@ def main():
         total_count = len(data_ops_status)
 
         # Calculate %Utilization using existing counts
-        if total_count == 0:
-            utilization_percentage = 0
-        else:
-            utilization_percentage = (rev_gen_count / total_count) * 100
+        utilization_percentage = (rev_gen_count / total_count) * 100
 
         # Create DataFrame for rev_gen, non_rev_gen, and total counts
         df_counts = pd.DataFrame({
             'Category': ['Rev Gen', 'Non Rev Gen', 'Total'],
             'Count': [rev_gen_count, non_rev_gen_count, total_count]
         })
-
-        # Display the %Utilization scorecard
-        st.write("## %Utilization Scorecard")
-        st.write(f"%Utilization: {utilization_percentage:.2f}%")
-        st.write("### Revenue Generation and Non-Revenue Generation Counts")
-        st.write(df_counts)
 
         # Fetch data from 'odoo_inventory' table for 'partner_id'
         data_partner_id = fetch_data_from_supabase('partner_id', battery_capacity, selected_cities)
@@ -90,7 +88,7 @@ def main():
             partner_id_counts = pd.Series(data_partner_id).value_counts().head(10)
 
             # Create columns to layout the charts
-            col1, col2 = st.columns(2)
+            col1, col2 = st.columns([1, 1])
 
             # Position the pie chart for 'ops_status' in the first column
             with col1:
@@ -114,6 +112,12 @@ def main():
                 plt.tight_layout()  # Adjust layout to prevent label overlap
                 plt.rcParams['font.size'] = 12  # Adjust font size of labels
                 st.pyplot(fig_partner_id)
+
+        # Display the %Utilization scorecard
+        st.write("## %Utilization Scorecard")
+        st.write(f"%Utilization: {utilization_percentage:.2f}%")
+        st.write("### Revenue Generation and Non-Revenue Generation Counts")
+        st.write(df_counts)
 
 if __name__ == "__main__":
     main()
