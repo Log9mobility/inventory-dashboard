@@ -106,7 +106,7 @@ def main():
                 ax_partner_id.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
                 plt.legend(partner_id_counts.index, loc="upper left", bbox_to_anchor=(1, 0.5))  # Place labels as legends and shift upwards
                 plt.tight_layout()  # Adjust layout to prevent label overlap
-                plt.rcParams['font.size'] = 12  # Adjust font size of labels
+                plt.rcParams['font.size'] = 9  # Adjust font size of labels
                 st.pyplot(fig_partner_id)
 
         # Display the %Utilization scorecard
