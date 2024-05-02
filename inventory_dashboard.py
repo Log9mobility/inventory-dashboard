@@ -4,7 +4,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 # Function to fetch data from Supabase table
-def fetch_data_from_supabase(column_name, battery_capacity=None, deployed_city=None, region=None):
+def fetch_data_from_supabase(column_name, battery_capacity=None, deployed_city=None):
     try:
         conn = psycopg2.connect(
             database="postgres",
@@ -15,25 +15,10 @@ def fetch_data_from_supabase(column_name, battery_capacity=None, deployed_city=N
         )
         cursor = conn.cursor()
         query = f"SELECT {column_name} FROM odoo_inventory WHERE 1=1"
-        if battery_capacity:
-            if len(battery_capacity) == 1:  # Handle single value case
-                query += f" AND battery_capacity = '{battery_capacity[0]}'"
-            else:
-                battery_capacity = tuple(map(str, battery_capacity))
-                query += f" AND battery_capacity IN {battery_capacity}"
+        if battery_capacity and battery_capacity != 'All':
+            query += f" AND battery_capacity = '{battery_capacity}'"
         if deployed_city:
-            if len(deployed_city) == 1:  # Handle single value case
-                query += f" AND LOWER(deployed_city) = LOWER('{deployed_city[0]}')"
-            else:
-                query += f" AND LOWER(deployed_city) IN ({', '.join([f'LOWER(\'{city}\')' for city in deployed_city])})"
-        if region and region.lower() != 'all':
-            city_lists = {
-                'north': ["delhi","jaipur","kanpur","lucknow","kolkata","varanasi","prayagraj","chandigarh","agra","panipat","sonipath","panchkula","gurgaon"],
-                'south': ["bangalore","bengaluru","chennai","hyderabad","vijayawada","mysore","coimbatore"],
-                'west': ["ahmedabad","mumbai","pune","vadodara","surat","gujarat"],
-            }
-            selected_cities = [city for region_name, city_list in city_lists.items() if region_name == region.lower() for city in city_list]
-            query += f" AND LOWER(deployed_city) IN ({', '.join([f'LOWER(\'{city}\')' for city in selected_cities])})"
+            query += f" AND TRIM(deployed_city) IN ({', '.join([f'\'{city.strip()}\' ' for city in deployed_city])})"
         cursor.execute(query)
         data = cursor.fetchall()
         conn.close()
@@ -63,19 +48,15 @@ def fetch_distinct_values(column_name):
 
 def main():
     # New filter for 'Battery Capacity'
-    battery_capacity_options = ['All', 2000, 3000, 4000, 5000]
+    battery_capacity_options = ['All'] + fetch_distinct_values('battery_capacity')
     battery_capacity = st.sidebar.selectbox('Select Battery Capacity', battery_capacity_options)
 
     # New filter for 'Deployed City'
     deployed_city_options = ['All'] + fetch_distinct_values('deployed_city')
     selected_cities = st.sidebar.multiselect('Select Deployed City', deployed_city_options)
 
-    # New filter for 'Region'
-    region_options = ['All', 'North', 'South', 'West']
-    selected_region = st.sidebar.selectbox('Select Region', region_options)
-
     # Fetch data from 'odoo_inventory' table for 'ops_status' with optional filters
-    data_ops_status = fetch_data_from_supabase('ops_status', battery_capacity, selected_cities, selected_region)
+    data_ops_status = fetch_data_from_supabase('ops_status', battery_capacity, selected_cities)
 
     if data_ops_status is not None:
         # Calculate counts for 'rev gen' and 'non rev gen'
@@ -102,7 +83,7 @@ def main():
         st.write(df_counts)
 
         # Fetch data from 'odoo_inventory' table for 'partner_id'
-        data_partner_id = fetch_data_from_supabase('partner_id', battery_capacity, selected_cities, selected_region)
+        data_partner_id = fetch_data_from_supabase('partner_id', battery_capacity, selected_cities)
 
         if data_partner_id is not None:
             # Count occurrences of each partner_id and select top 10
