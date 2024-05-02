@@ -4,7 +4,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 # Function to fetch data from Supabase table
-def fetch_data_from_supabase(column_name, battery_capacity=None, deployed_city=None):
+def fetch_data_from_supabase(column_name, battery_capacity=None, deployed_city=None, region=None):
     try:
         conn = psycopg2.connect(
             database="postgres",
@@ -26,6 +26,25 @@ def fetch_data_from_supabase(column_name, battery_capacity=None, deployed_city=N
                 query += f" AND deployed_city = '{deployed_city[0]}'"
             else:
                 query += f" AND deployed_city IN {tuple(deployed_city)}"
+        if region:
+            if region == 'All':
+                pass  # No additional filter for 'All' option
+            elif region == 'None':
+                city_lists = {
+                    'North': ["Delhi","Jaipur","Kanpur","Lucknow","Kolkata","VARANASI","Varanasi","Prayagraj","Chandigarh","Agra","Panipat","Sonipath","Panchkula","Gurgaon"],
+                    'South': ["Bangalore","Bengaluru","Chennai","Hyderabad","Vijayawada","Mysore","Coimbatore"],
+                    'West': ["Ahmedabad","Mumbai","Pune","Vadodara","Surat","Gujarat"],
+                }
+                selected_cities = [city for city in deployed_city if all(city not in city_list for region_name, city_list in city_lists.items())]
+                query += f" AND deployed_city IN {tuple(selected_cities)}"
+            else:
+                city_lists = {
+                    'North': ["Delhi","Jaipur","Kanpur","Lucknow","Kolkata","VARANASI","Varanasi","Prayagraj","Chandigarh","Agra","Panipat","Sonipath","Panchkula","Gurgaon"],
+                    'South': ["Bangalore","Bengaluru","Chennai","Hyderabad","Vijayawada","Mysore","Coimbatore"],
+                    'West': ["Ahmedabad","Mumbai","Pune","Vadodara","Surat","Gujarat"],
+                }
+                selected_cities = [city for region_name, city_list in city_lists.items() if region_name == region for city in city_list]
+                query += f" AND deployed_city IN {tuple(selected_cities)}"
         cursor.execute(query)
         data = cursor.fetchall()
         conn.close()
@@ -62,8 +81,12 @@ def main():
     distinct_cities = fetch_distinct_values('deployed_city')
     selected_cities = st.sidebar.multiselect('Select Deployed Cities', distinct_cities)
 
+    # New filter for 'Region'
+    region_options = ['All', 'North', 'South', 'West', 'None']
+    selected_region = st.sidebar.selectbox('Select Region', region_options)
+
     # Fetch data from 'odoo_inventory' table for 'ops_status' with optional filters
-    data_ops_status = fetch_data_from_supabase('ops_status', battery_capacity, selected_cities)
+    data_ops_status = fetch_data_from_supabase('ops_status', battery_capacity, selected_cities, selected_region)
 
     if data_ops_status is not None:
         # Calculate counts for 'rev gen' and 'non rev gen'
@@ -81,14 +104,14 @@ def main():
         })
 
         # Fetch data from 'odoo_inventory' table for 'partner_id'
-        data_partner_id = fetch_data_from_supabase('partner_id', battery_capacity, selected_cities)
+        data_partner_id = fetch_data_from_supabase('partner_id', battery_capacity, selected_cities, selected_region)
 
         if data_partner_id is not None:
             # Count occurrences of each partner_id and select top 10
             partner_id_counts = pd.Series(data_partner_id).value_counts().head(10)
 
             # Create columns to layout the charts
-            col1, col2 = st.columns([1, 1])
+            col1, col2 = st.columns(2)
 
             # Position the pie chart for 'ops_status' in the first column
             with col1:
