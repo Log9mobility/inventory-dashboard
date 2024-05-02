@@ -1,7 +1,7 @@
-import streamlit as st
 import psycopg2
 import pandas as pd
 import matplotlib.pyplot as plt
+import streamlit as st
 
 # Function to fetch data from Supabase table
 def fetch_data_from_supabase(column_name, battery_capacity=None, deployed_city=None):
@@ -53,6 +53,7 @@ def fetch_distinct_values(column_name):
         st.error(f"Error connecting to Supabase: {e}")
         return None
 
+# Main function to create the scorecard chart and other visualizations
 def main():
     # Universal filters
     distinct_battery_capacities = fetch_distinct_values('battery_capacity')
@@ -118,11 +119,19 @@ def main():
         st.write("### Revenue Generation and Non-Revenue Generation Counts")
         st.write(df_counts)
 
-        # Display the table showing the count of various 'ops_status' across all 'deployed_city'
-        st.write("## Ops Status Counts by Deployed City")
-        ops_status_counts_by_city = pd.Series(data_ops_status).value_counts().reset_index()
-        ops_status_counts_by_city.columns = ['Ops Status', 'Count']
-        st.write(ops_status_counts_by_city)
+        # Calculate counts for 'ops_status' across all 'deployed_city'
+        ops_status_pivot_data = []
+        for city in selected_cities:
+            data_city_ops_status = fetch_data_from_supabase('ops_status', battery_capacity, [city])
+            if data_city_ops_status is not None:
+                ops_status_count = pd.Series(data_city_ops_status).value_counts()
+                ops_status_pivot_data.append(ops_status_count)
+        ops_status_pivot_df = pd.DataFrame(ops_status_pivot_data, index=selected_cities)
+
+        # Display the pivot table
+        st.write("## Ops Status Pivot Table")
+        st.write(ops_status_pivot_df)
 
 if __name__ == "__main__":
     main()
+
