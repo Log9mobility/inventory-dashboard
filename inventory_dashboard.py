@@ -15,9 +15,12 @@ def fetch_data_from_supabase(column_name, battery_capacity=None, deployed_city=N
         )
         cursor = conn.cursor()
         query = f"SELECT {column_name} FROM odoo_inventory WHERE 1=1"
-        if battery_capacity and 'All' not in battery_capacity:
-            battery_capacity = tuple(map(str, battery_capacity))
-            query += f" AND battery_capacity IN {battery_capacity}"
+        if battery_capacity:
+            if len(battery_capacity) == 1:  # Handle single value case
+                query += f" AND battery_capacity = '{battery_capacity[0]}'"
+            else:
+                battery_capacity = tuple(map(str, battery_capacity))
+                query += f" AND battery_capacity IN {battery_capacity}"
         if deployed_city:
             query += f" AND deployed_city IN {tuple(deployed_city)}"
         cursor.execute(query)
@@ -115,6 +118,7 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
 
