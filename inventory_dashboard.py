@@ -65,6 +65,9 @@ def main():
     # Fetch data from 'odoo_inventory' table for 'ops_status' with optional filters
     data_ops_status = fetch_data_from_supabase('ops_status', battery_capacity, selected_cities)
 
+    # Print the fetched data to check if it's empty
+    print("Data for ops_status:", data_ops_status)
+
     if data_ops_status is not None:
         # Calculate counts for 'rev gen' and 'non rev gen'
         rev_gen_count = sum(1 for status in data_ops_status if status in ['RENTAL', 'PORTER'])
