@@ -18,9 +18,8 @@ def fetch_data_from_supabase(column_name, battery_capacity=None, deployed_city=N
         if battery_capacity and 'All' not in battery_capacity:
             battery_capacity = tuple(map(str, battery_capacity))
             query += f" AND battery_capacity IN {battery_capacity}"
-        if deployed_city and 'All' not in deployed_city:
-            deployed_city = tuple(map(str, deployed_city))
-            query += f" AND deployed_city IN {deployed_city}"
+        if deployed_city:
+            query += f" AND deployed_city IN {tuple(deployed_city)}"
         cursor.execute(query)
         data = cursor.fetchall()
         conn.close()
@@ -50,13 +49,12 @@ def fetch_distinct_values(column_name):
 
 # Main function to create the scorecard chart and other visualizations
 def main():
-    # Battery capacity filter
+    # Universal filters
     distinct_battery_capacities = fetch_distinct_values('battery_capacity')
     battery_capacity = st.sidebar.multiselect('Select Battery Capacity', distinct_battery_capacities + ['All'])
 
-    # Deployed city filter
     distinct_cities = fetch_distinct_values('deployed_city')
-    selected_cities = st.sidebar.multiselect('Select Deployed Cities', distinct_cities + ['All'])
+    selected_cities = st.sidebar.multiselect('Select Deployed Cities', distinct_cities)
 
     # Fetch data from 'odoo_inventory' table for 'ops_status' with optional filters
     data_ops_status = fetch_data_from_supabase('ops_status', battery_capacity, selected_cities)
@@ -106,7 +104,7 @@ def main():
                 ax_partner_id.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
                 plt.legend(partner_id_counts.index, loc="upper left", bbox_to_anchor=(1, 0.5))  # Place labels as legends and shift upwards
                 plt.tight_layout()  # Adjust layout to prevent label overlap
-                plt.rcParams['font.size'] = 9  # Adjust font size of labels
+                plt.rcParams['font.size'] = 12  # Adjust font size of labels
                 st.pyplot(fig_partner_id)
 
         # Display the %Utilization scorecard
