@@ -23,28 +23,17 @@ def fetch_data_from_supabase(column_name, battery_capacity=None, deployed_city=N
                 query += f" AND battery_capacity IN {battery_capacity}"
         if deployed_city:
             if len(deployed_city) == 1:  # Handle single value case
-                query += f" AND deployed_city = '{deployed_city[0]}'"
+                query += f" AND LOWER(deployed_city) = LOWER('{deployed_city[0]}')"
             else:
-                query += f" AND deployed_city IN {tuple(deployed_city)}"
-        if region:
-            if region == 'All':
-                pass  # No additional filter for 'All' option
-            elif region == 'None':
-                city_lists = {
-                    'North': ["Delhi","Jaipur","Kanpur","Lucknow","Kolkata","Varanasi","Prayagraj","Chandigarh","Agra","Panipat","Sonipath","Panchkula","Gurgaon"],
-                    'South': ["Bangalore","Bengaluru","Chennai","Hyderabad","Vijayawada","Mysore","Coimbatore"],
-                    'West': ["Ahmedabad","Mumbai","Pune","Vadodara","Surat","Gujarat"],
-                }
-                selected_cities = [city for city in deployed_city if all(city not in city_list for region_name, city_list in city_lists.items())]
-                query += f" AND deployed_city IN {tuple(selected_cities)}"
-            else:
-                city_lists = {
-                    'North': ["Delhi","Jaipur","Kanpur","Lucknow","Kolkata","Varanasi","Prayagraj","Chandigarh","Agra","Panipat","Sonipath","Panchkula","Gurgaon"],
-                    'South': ["Bangalore","Bengaluru","Chennai","Hyderabad","Vijayawada","Mysore","Coimbatore"],
-                    'West': ["Ahmedabad","Mumbai","Pune","Vadodara","Surat","Gujarat"],
-                }
-                selected_cities = [city for region_name, city_list in city_lists.items() if region_name == region for city in city_list]
-                query += f" AND deployed_city IN {tuple(selected_cities)}"
+                query += f" AND LOWER(deployed_city) IN ({', '.join([f'LOWER(\'{city}\')' for city in deployed_city])})"
+        if region and region.lower() != 'all':
+            city_lists = {
+                'north': ["delhi","jaipur","kanpur","lucknow","kolkata","varanasi","prayagraj","chandigarh","agra","panipat","sonipath","panchkula","gurgaon"],
+                'south': ["bangalore","bengaluru","chennai","hyderabad","vijayawada","mysore","coimbatore"],
+                'west': ["ahmedabad","mumbai","pune","vadodara","surat","gujarat"],
+            }
+            selected_cities = [city for region_name, city_list in city_lists.items() if region_name == region.lower() for city in city_list]
+            query += f" AND LOWER(deployed_city) IN ({', '.join([f'LOWER(\'{city}\')' for city in selected_cities])})"
         cursor.execute(query)
         data = cursor.fetchall()
         conn.close()
@@ -73,28 +62,22 @@ def fetch_distinct_values(column_name):
         return None
 
 def main():
+    # New filter for 'Battery Capacity'
+    battery_capacity_options = ['All', 2000, 3000, 4000, 5000]
+    battery_capacity = st.sidebar.selectbox('Select Battery Capacity', battery_capacity_options)
+
+    # New filter for 'Deployed City'
+    deployed_city_options = ['All'] + fetch_distinct_values('deployed_city')
+    selected_cities = st.sidebar.multiselect('Select Deployed City', deployed_city_options)
+
     # New filter for 'Region'
-    region_options = ['All', 'North', 'South', 'West', 'None']
+    region_options = ['All', 'North', 'South', 'West']
     selected_region = st.sidebar.selectbox('Select Region', region_options)
-
-    # Fetch distinct cities from 'odoo_inventory' table
-    distinct_cities = fetch_distinct_values('deployed_city')
-
-    # Define city lists for each region
-    city_lists = {
-        'North': ["Delhi","Jaipur","Kanpur","Lucknow","Kolkata","Varanasi","Prayagraj","Chandigarh","Agra","Panipat","Sonipath","Panchkula","Gurgaon"],
-        'South': ["Bangalore","Bengaluru","Chennai","Hyderabad","Vijayawada","Mysore","Coimbatore"],
-        'West': ["Ahmedabad","Mumbai","Pune","Vadodara","Surat","Gujarat"],
-    }
 
     # Fetch data from 'odoo_inventory' table for 'ops_status' with optional filters
     data_ops_status = fetch_data_from_supabase('ops_status', battery_capacity, selected_cities, selected_region)
 
     if data_ops_status is not None:
-        # Filter cities based on selected region
-        if selected_region != 'All':
-            selected_cities = [city for city in distinct_cities if city in city_lists[selected_region]]
-
         # Calculate counts for 'rev gen' and 'non rev gen'
         rev_gen_count = sum(1 for status in data_ops_status if status in ['RENTAL', 'PORTER'])
         non_rev_gen_count = len(data_ops_status) - rev_gen_count
@@ -153,7 +136,6 @@ def main():
 
 if __name__ == "__main__":
     main()
-
 
 
 
