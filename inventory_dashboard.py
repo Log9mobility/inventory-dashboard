@@ -22,7 +22,10 @@ def fetch_data_from_supabase(column_name, battery_capacity=None, deployed_city=N
                 battery_capacity = tuple(map(str, battery_capacity))
                 query += f" AND battery_capacity IN {battery_capacity}"
         if deployed_city:
-            query += f" AND deployed_city IN {tuple(deployed_city)}"
+            if len(deployed_city) == 1:  # Handle single value case
+                query += f" AND deployed_city = '{deployed_city[0]}'"
+            else:
+                query += f" AND deployed_city IN {tuple(deployed_city)}"
         cursor.execute(query)
         data = cursor.fetchall()
         conn.close()
@@ -118,7 +121,6 @@ def main():
 
 if __name__ == "__main__":
     main()
-
 
 
 
