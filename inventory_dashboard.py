@@ -81,21 +81,67 @@ def main():
         })
 
         # Fetch data from 'odoo_inventory' table for 'partner_id'
-        data_partner_id = fetch_data_from_supabase(['deployed_city', 'partner_id'], battery_capacity, selected_cities)
+        data_partner_id = fetch_data_from_supabase(['partner_id'], battery_capacity, selected_cities)
 
         if data_partner_id is not None:
-            # Create DataFrame for partner_id counts by deployed_city
-            df_partner_id_counts = pd.DataFrame(data_partner_id, columns=['deployed_city', 'partner_id']).groupby('deployed_city')['partner_id'].count().reset_index()
+            # Count occurrences of each partner_id and select top 10
+            partner_id_counts = pd.Series(data_partner_id).value_counts().head(10)
 
-            # Display the table showing count of partner_id for each deployed_city
-            st.write("## Count of partner_id for each deployed_city")
-            st.table(df_partner_id_counts)
+            # Create columns to layout the charts
+            col1, col2 = st.columns([1, 1])
+
+            # Position the pie chart for 'ops_status' in the first column
+            with col1:
+                st.write("## Ops Status Pie Chart")
+                ops_status_counts = pd.Series(data_ops_status).value_counts()
+                fig_ops_status, ax_ops_status = plt.subplots(figsize=(10, 6))
+                ax_ops_status.pie(ops_status_counts, labels=None, autopct='%1.1f%%', startangle=90)
+                ax_ops_status.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+                plt.legend(ops_status_counts.index, loc="upper left", bbox_to_anchor=(1, 0.5))  # Place labels as legends and shift upwards
+                plt.tight_layout()  # Adjust layout to prevent label overlap
+                plt.rcParams['font.size'] = 12  # Adjust font size of labels
+                st.pyplot(fig_ops_status)
+
+            # Position the pie chart for 'partner_id' in the second column
+            with col2:
+                st.write("## Top 10 Partner ID Pie Chart")
+                fig_partner_id, ax_partner_id = plt.subplots(figsize=(10, 9))
+                ax_partner_id.pie(partner_id_counts, labels=None, autopct='%1.1f%%', startangle=90)
+                ax_partner_id.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+                plt.legend(partner_id_counts.index, loc="upper left", bbox_to_anchor=(1, 0.5))  # Place labels as legends and shift upwards
+                plt.tight_layout()  # Adjust layout to prevent label overlap
+                plt.rcParams['font.size'] = 12  # Adjust font size of labels
+                st.pyplot(fig_partner_id)
 
         # Display the %Utilization scorecard
         st.write("## %Utilization Scorecard")
         st.write(f"%Utilization: {utilization_percentage:.2f}%")
         st.write("### Revenue Generation and Non-Revenue Generation Counts")
         st.write(df_counts)
+
+        # Fetch data for pivot table
+        data_pivot = fetch_data_from_supabase(['deployed_city', 'ops_status'], battery_capacity, selected_cities)
+
+        if data_pivot is not None:
+            # Create DataFrame
+            df_pivot = pd.DataFrame(data_pivot, columns=['deployed_city', 'ops_status'])
+            # Pivot table
+            pivot_table = pd.pivot_table(df_pivot, index='deployed_city', columns='ops_status', aggfunc='size', fill_value=0)
+            # Display pivot table
+            st.write("## Pivot Table: Count of Ops Status Across Deployed Cities")
+            st.write(pivot_table)
+
+        # Fetch data for partner_id count table
+        data_partner_id_count = fetch_data_from_supabase(['deployed_city', 'partner_id'], battery_capacity, selected_cities)
+
+        if data_partner_id_count is not None:
+            # Create DataFrame
+            df_partner_id_count = pd.DataFrame(data_partner_id_count, columns=['deployed_city', 'partner_id'])
+            # Group by deployed_city and count partner_id
+            partner_id_count_table = df_partner_id_count.groupby('deployed_city')['partner_id'].value_counts().unstack(fill_value=0)
+            # Display partner_id count table
+            st.write("## Table: Count of Partner IDs Across Deployed Cities")
+            st.write(partner_id_count_table)
 
 if __name__ == "__main__":
     main()
