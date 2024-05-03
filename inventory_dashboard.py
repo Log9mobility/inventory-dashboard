@@ -130,7 +130,18 @@ def main():
             # Display pivot table
             st.write("## Pivot Table: Count of Ops Status Across Deployed Cities")
             st.write(pivot_table)
+            
+       # Fetch data from 'odoo_inventory' table for 'partner_id'
+        data_partner_id = fetch_data_from_supabase(['deployed_city', 'partner_id'], battery_capacity, selected_cities)
 
+        if data_partner_id is not None:
+            # Create DataFrame
+            df_partner_id = pd.DataFrame(data_partner_id, columns=['deployed_city', 'partner_id'])
+            # Group by deployed_city and partner_id, then count occurrences
+            df_counts_partner_id = df_partner_id.groupby(['deployed_city', 'partner_id']).size().reset_index(name='count')
+            # Pivot table
+            pivot_table_partner_id = pd.pivot_table(df_counts_partner_id, index='deployed_city', columns='partner_id', values='count', aggfunc='sum', fill_value=0)
+            
 if __name__ == "__main__":
     main()
 
