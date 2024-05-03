@@ -63,7 +63,7 @@ def main():
     selected_cities = st.sidebar.multiselect('Select Deployed Cities', distinct_cities + ['All'])
 
     # Fetch data from 'odoo_inventory' table for 'ops_status' with optional filters
-    data_ops_status = fetch_data_from_supabase(['ops_status'], battery_capacity, selected_cities)
+    data_ops_status = fetch_data_from_supabase(['ops_status'])
 
     if data_ops_status is not None:
         # Calculate counts for 'rev gen' and 'non rev gen'
