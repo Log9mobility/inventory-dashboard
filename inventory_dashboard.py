@@ -120,30 +120,22 @@ def main():
         st.write(df_counts)
 
         # Fetch data for pivot table
-        data_pivot = fetch_data_from_supabase(['deployed_city', 'ops_status'], battery_capacity, selected_cities)
+        data_pivot = fetch_data_from_supabase(['deployed_city', 'partner_id'], battery_capacity, selected_cities)
 
         if data_pivot is not None:
             # Create DataFrame
-            df_pivot = pd.DataFrame(data_pivot, columns=['deployed_city', 'ops_status'])
+            df_pivot = pd.DataFrame(data_pivot, columns=['deployed_city', 'partner_id'])
             # Pivot table
-            pivot_table = pd.pivot_table(df_pivot, index='deployed_city', columns='ops_status', aggfunc='size', fill_value=0)
+            pivot_table = pd.pivot_table(df_pivot, index='partner_id', columns='deployed_city', aggfunc='size', fill_value=0)
+            
+            # Add row and column totals
+            pivot_table.loc['Total'] = pivot_table.sum()
+            pivot_table['Total'] = pivot_table.sum(axis=1)
+
             # Display pivot table
-            st.write("## Pivot Table: Count of Ops Status Across Deployed Cities")
+            st.write("## Table: Count of Deployed Cities Across Partner IDs")
             st.write(pivot_table)
-
-        # Fetch data for partner_id count table
-        data_partner_id_count = fetch_data_from_supabase(['deployed_city', 'partner_id'], battery_capacity, selected_cities)
-
-        if data_partner_id_count is not None:
-            # Create DataFrame
-            df_partner_id_count = pd.DataFrame(data_partner_id_count, columns=['deployed_city','partner_id'])
-            # Group by deployed_city and count partner_id
-            partner_id_count_table = df_partner_id_count.groupby('partner_id')['deployed_city'].value_counts().unstack(fill_value=0)
-            # Display partner_id count table
-            st.write("## Table: Count of Partner IDs Across Deployed Cities")
-            st.write(partner_id_count_table)
 
 if __name__ == "__main__":
     main()
-
 
