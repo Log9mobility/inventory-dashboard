@@ -117,7 +117,7 @@ def main():
                 fig_partner_id, ax_partner_id = plt.subplots(figsize=(7, 7))
                 ax_partner_id.pie(partner_id_counts, labels=None, autopct='%1.1f%%', startangle=90)
                 ax_partner_id.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
-                plt.legend(partner_id_counts.index, loc="upper left", bbox_to_anchor=(1.2, 0.8))  # Place labels as legends and shift upwards
+                plt.legend(partner_id_counts.index, loc="upper left", bbox_to_anchor=(1, 0.8))  # Place labels as legends and shift upwards
                 plt.tight_layout()  # Adjust layout to prevent label overlap
                 plt.rcParams['font.size'] = 12  # Adjust font size of labels
                 st.pyplot(fig_partner_id)
