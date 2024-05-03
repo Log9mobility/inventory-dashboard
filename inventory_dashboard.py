@@ -80,13 +80,13 @@ def main():
             'Count': [rev_gen_count, non_rev_gen_count, total_count]
         })
 
-        # Display the %Utilization scorecard on the top left side
-        st.sidebar.write("## %Utilization Scorecard")
-        st.sidebar.write(f"%Utilization: {utilization_percentage:.2f}%")
+        # Display the %Utilization scorecard at the top left side
+        st.write("## %Utilization Scorecard")
+        st.write(f"%Utilization: {utilization_percentage:.2f}%")
 
-        # Display revenue generation and non-revenue generation counts on the top right side
-        st.sidebar.write("## Revenue Generation and Non-Revenue Generation Counts")
-        st.sidebar.write(df_counts)
+        # Display revenue generation and non-revenue generation counts at the top right side
+        st.write("## Revenue Generation and Non-Revenue Generation Counts")
+        st.write(df_counts)
 
         # Fetch data from 'odoo_inventory' table for 'partner_id'
         data_partner_id = fetch_data_from_supabase(['partner_id'], battery_capacity, selected_cities)
