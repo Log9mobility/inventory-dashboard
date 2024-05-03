@@ -103,7 +103,7 @@ def main():
             with col1:
                 st.write("## Ops Status Pie Chart")
                 ops_status_counts = pd.Series(data_ops_status).value_counts()
-                fig_ops_status, ax_ops_status = plt.subplots(figsize=(14, 12))
+                fig_ops_status, ax_ops_status = plt.subplots(figsize=(10, 9))
                 ax_ops_status.pie(ops_status_counts, labels=None, autopct='%1.1f%%', startangle=90)
                 ax_ops_status.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
                 plt.legend(ops_status_counts.index, loc="upper left", bbox_to_anchor=(1, 0.5))  # Place labels as legends and shift upwards
