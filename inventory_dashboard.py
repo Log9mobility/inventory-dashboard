@@ -143,5 +143,16 @@ def main():
             st.write("## Table: Count of Deployed Cities Across Partner IDs")
             st.write(partner_id_count_table)
 
+        # Fetch data for pivot table
+        data_pivot = fetch_data_from_supabase(['deployed_city', 'chassis_number', 'partner_id', 'battery_capacity', 'ops_status'], battery_capacity, selected_cities)
+
+        if data_pivot is not None:
+            # Create DataFrame
+            df_pivot = pd.DataFrame(data_pivot, columns=['deployed_city', 'chassis_number', 'partner_id', 'battery_capacity', 'ops_status'])
+            
+            # Display the table
+            st.write("## Table: Deployed Assets Information")
+            st.write(df_pivot)
+
 if __name__ == "__main__":
     main()
