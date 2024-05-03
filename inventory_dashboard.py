@@ -132,6 +132,9 @@ def main():
             pivot_table.loc['Total'] = pivot_table.sum()
             pivot_table['Total'] = pivot_table.sum(axis=1)
 
+            # Sort by row totals in descending order
+            pivot_table = pivot_table.sort_values(by='Total', ascending=False)
+
             # Display pivot table
             st.write("## Table: Count of Deployed Cities Across Partner IDs")
             st.write(pivot_table)
