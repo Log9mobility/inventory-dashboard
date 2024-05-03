@@ -60,7 +60,7 @@ def main():
     battery_capacity = st.sidebar.multiselect('Select Battery Capacity', distinct_battery_capacities + ['All'])
 
     distinct_cities = fetch_distinct_values('deployed_city')
-    selected_cities = st.sidebar.multiselect('Select Deployed Cities', distinct_cities)
+    selected_cities = st.sidebar.multiselect('Select Deployed Cities', distinct_cities + ['All'])
 
     # Fetch data from 'odoo_inventory' table for 'ops_status' with optional filters
     data_ops_status = fetch_data_from_supabase(['ops_status'], battery_capacity, selected_cities)
@@ -72,7 +72,7 @@ def main():
         total_count = len(data_ops_status)
 
         # Calculate %Utilization using existing counts
-        utilization_percentage = (rev_gen_count / total_count) * 100
+        utilization_percentage = (rev_gen_count / total_count) * 100 if total_count != 0 else 0
 
         # Create DataFrame for rev_gen, non_rev_gen, and total counts
         df_counts = pd.DataFrame({
