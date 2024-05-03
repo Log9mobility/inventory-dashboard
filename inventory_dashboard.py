@@ -80,6 +80,14 @@ def main():
             'Count': [rev_gen_count, non_rev_gen_count, total_count]
         })
 
+        # Display the %Utilization scorecard on the top left side
+        st.sidebar.write("## %Utilization Scorecard")
+        st.sidebar.write(f"%Utilization: {utilization_percentage:.2f}%")
+
+        # Display revenue generation and non-revenue generation counts on the top right side
+        st.sidebar.write("## Revenue Generation and Non-Revenue Generation Counts")
+        st.sidebar.write(df_counts)
+
         # Fetch data from 'odoo_inventory' table for 'partner_id'
         data_partner_id = fetch_data_from_supabase(['partner_id'], battery_capacity, selected_cities)
 
@@ -112,12 +120,6 @@ def main():
                 plt.tight_layout()  # Adjust layout to prevent label overlap
                 plt.rcParams['font.size'] = 12  # Adjust font size of labels
                 st.pyplot(fig_partner_id)
-
-        # Display the %Utilization scorecard
-        st.write("## %Utilization Scorecard")
-        st.write(f"%Utilization: {utilization_percentage:.2f}%")
-        st.write("### Revenue Generation and Non-Revenue Generation Counts")
-        st.write(df_counts)
 
         # Fetch data for pivot table
         data_pivot = fetch_data_from_supabase(['deployed_city', 'ops_status'], battery_capacity, selected_cities)
@@ -156,3 +158,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
