@@ -138,7 +138,7 @@ def main():
             # Create DataFrame
             df_partner_id_count = pd.DataFrame(data_partner_id_count, columns=['deployed_city', 'partner_id'])
             # Group by deployed_city and count partner_id
-            partner_id_count_table = df_partner_id_count.groupby('deployed_city')['partner_id'].value_counts().unstack(fill_value=0)
+            partner_id_count_table = df_partner_id_count.groupby('partner_id')['partner_id'].value_counts().unstack(fill_value=0)
             # Display partner_id count table
             st.write("## Table: Count of Partner IDs Across Deployed Cities")
             st.write(partner_id_count_table)
