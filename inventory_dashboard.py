@@ -67,7 +67,7 @@ def main():
 
     if data_ops_status is not None:
         # Calculate counts for 'rev gen' and 'non rev gen'
-        rev_gen_count = sum(1 for status in data_ops_status if status in [''RENTAL'', ''PORTER''])
+        rev_gen_count = sum(1 for status in data_ops_status if status in ['RENTAL', 'PORTER'])
         non_rev_gen_count = len(data_ops_status) - rev_gen_count
         total_count = len(data_ops_status)
 
