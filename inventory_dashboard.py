@@ -80,11 +80,11 @@ def main():
             'Count': [rev_gen_count, non_rev_gen_count, total_count]
         })
 
-        # Display the %Utilization scorecard at the top left side
-        st.write("## %Utilization Scorecard")
-        st.write(f"%Utilization: {utilization_percentage:.2f}%")
+        # Display the %Utilization scorecard and revenue generation counts vertically aligned at the top of the page
+        st.write("# Scorecard")
+        st.write("## %Utilization")
+        st.write(f"{utilization_percentage:.2f}%")
 
-        # Display revenue generation and non-revenue generation counts at the top right side
         st.write("## Revenue Generation and Non-Revenue Generation Counts")
         st.write(df_counts)
 
