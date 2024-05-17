@@ -91,28 +91,29 @@ def main():
             st.write("## Revenue Generation and Non-Revenue Generation Counts")
             st.write(df_counts)
 
-        # Display the pie charts
+              # Display the pie charts
         st.write("## Ops Status Pie Chart")
         ops_status_counts = pd.Series(ops_status_list).value_counts()
         fig_ops_status = px.pie(ops_status_counts, values=ops_status_counts.values, names=ops_status_counts.index, 
                                 title="Ops Status Pie Chart", hover_name=ops_status_counts.index, 
                                 hover_data={"value": True}, labels={'value':'Count'})
         st.plotly_chart(fig_ops_status)
-        
+
         # Fetch data from 'odoo_inventory' table for 'partner_id'
         data_partner_id = fetch_data_from_supabase(['partner_id'], battery_capacity if 'All' not in battery_capacity else None, selected_cities if 'All' not in selected_cities else None)
-        
+
         if data_partner_id is not None:
             # Count occurrences of each partner_id and select top 10
             partner_id_list = [item[0] for item in data_partner_id]
             partner_id_counts = pd.Series(partner_id_list).value_counts().head(10)
-        
+
             # Display the pie chart for 'partner_id'
             st.write("## Top 10 Partner ID Pie Chart")
             fig_partner_id = px.pie(partner_id_counts, values=partner_id_counts.values, names=partner_id_counts.index, 
                                     title="Top 10 Partner ID Pie Chart", hover_name=partner_id_counts.index, 
                                     hover_data={"value": True}, labels={'value':'Count'})
             st.plotly_chart(fig_partner_id)
+            
         # Fetch data for pivot table
         data_pivot = fetch_data_from_supabase(['deployed_city', 'ops_status'], battery_capacity if 'All' not in battery_capacity else None, selected_cities if 'All' not in selected_cities else None)
 
