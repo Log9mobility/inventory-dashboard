@@ -15,13 +15,13 @@ def fetch_data_from_supabase(columns, battery_capacity=None, deployed_city=None)
         )
         cursor = conn.cursor()
         query = f"SELECT {', '.join(columns)} FROM odoo_inventory WHERE 1=1"
-        if battery_capacity:
+        if battery_capacity and 'All' not in battery_capacity:
             if len(battery_capacity) == 1:  # Handle single value case
                 query += f" AND battery_capacity = '{battery_capacity[0]}'"
             else:
                 battery_capacity = tuple(map(str, battery_capacity))
                 query += f" AND battery_capacity IN {battery_capacity}"
-        if deployed_city:
+        if deployed_city and 'All' not in deployed_city:
             if len(deployed_city) == 1:  # Handle single value case
                 query += f" AND deployed_city = '{deployed_city[0]}'"
             else:
@@ -63,13 +63,14 @@ def main():
     selected_cities = st.sidebar.multiselect('Select Deployed Cities', distinct_cities + ['All'])
 
     # Fetch data from 'odoo_inventory' table for 'ops_status' with optional filters
-    data_ops_status = fetch_data_from_supabase(['ops_status'])
+    data_ops_status = fetch_data_from_supabase(['ops_status'], battery_capacity if 'All' not in battery_capacity else None, selected_cities if 'All' not in selected_cities else None)
 
     if data_ops_status is not None:
         # Calculate counts for 'rev gen' and 'non rev gen'
-        rev_gen_count = sum(1 for status in data_ops_status if status in ['RENTAL', 'PORTER'])
-        non_rev_gen_count = len(data_ops_status) - rev_gen_count
-        total_count = len(data_ops_status)
+        ops_status_list = [item[0] for item in data_ops_status]
+        rev_gen_count = sum(1 for status in ops_status_list if status in ['RENTAL', 'PORTER'])
+        non_rev_gen_count = len(ops_status_list) - rev_gen_count
+        total_count = len(ops_status_list)
 
         # Calculate %Utilization using existing counts
         utilization_percentage = (rev_gen_count / total_count) * 100 if total_count != 0 else 0
@@ -90,11 +91,12 @@ def main():
             st.write(df_counts)
 
         # Fetch data from 'odoo_inventory' table for 'partner_id'
-        data_partner_id = fetch_data_from_supabase(['partner_id'], battery_capacity, selected_cities)
+        data_partner_id = fetch_data_from_supabase(['partner_id'], battery_capacity if 'All' not in battery_capacity else None, selected_cities if 'All' not in selected_cities else None)
 
         if data_partner_id is not None:
             # Count occurrences of each partner_id and select top 10
-            partner_id_counts = pd.Series(data_partner_id).value_counts().head(10)
+            partner_id_list = [item[0] for item in data_partner_id]
+            partner_id_counts = pd.Series(partner_id_list).value_counts().head(10)
 
             # Create columns to layout the charts
             col1, col2 = st.columns([1, 1])
@@ -102,7 +104,7 @@ def main():
             # Position the pie chart for 'ops_status' in the first column
             with col1:
                 st.write("## Ops Status Pie Chart")
-                ops_status_counts = pd.Series(data_ops_status).value_counts()
+                ops_status_counts = pd.Series(ops_status_list).value_counts()
                 fig_ops_status, ax_ops_status = plt.subplots(figsize=(10, 9))
                 ax_ops_status.pie(ops_status_counts, labels=None, autopct='%1.1f%%', startangle=90)
                 ax_ops_status.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
@@ -123,7 +125,7 @@ def main():
                 st.pyplot(fig_partner_id)
 
         # Fetch data for pivot table
-        data_pivot = fetch_data_from_supabase(['deployed_city', 'ops_status'], battery_capacity, selected_cities)
+        data_pivot = fetch_data_from_supabase(['deployed_city', 'ops_status'], battery_capacity if 'All' not in battery_capacity else None, selected_cities if 'All' not in selected_cities else None)
 
         if data_pivot is not None:
             # Create DataFrame
@@ -135,7 +137,7 @@ def main():
             st.write(pivot_table)
 
         # Fetch data for partner_id count table
-        data_partner_id_count = fetch_data_from_supabase(['deployed_city', 'partner_id'], battery_capacity, selected_cities)
+        data_partner_id_count = fetch_data_from_supabase(['deployed_city', 'partner_id'], battery_capacity if 'All' not in battery_capacity else None, selected_cities if 'All' not in selected_cities else None)
 
         if data_partner_id_count is not None:
             # Create DataFrame
@@ -147,7 +149,7 @@ def main():
             st.write(partner_id_count_table)
 
         # Fetch data for pivot table
-        data_pivot = fetch_data_from_supabase(['deployed_city', 'chassis_number', 'partner_id', 'battery_capacity', 'ops_status'], battery_capacity, selected_cities)
+        data_pivot = fetch_data_from_supabase(['deployed_city', 'chassis_number', 'partner_id', 'battery_capacity', 'ops_status'], battery_capacity if 'All' not in battery_capacity else None, selected_cities if 'All' not in selected_cities else None)
 
         if data_pivot is not None:
             # Create DataFrame
@@ -159,4 +161,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
