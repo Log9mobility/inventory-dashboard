@@ -99,10 +99,10 @@ def main():
             partner_id_counts = pd.Series(partner_id_list).value_counts().head(10)
 
             # Create columns to layout the charts
-            col1, col2 = st.columns([1, 1])
+            # col1, col2 = st.columns([1, 1])
 
             # Position the pie chart for 'ops_status' in the first column
-            with col1:
+            # with col1:
                 st.write("## Ops Status Pie Chart")
                 ops_status_counts = pd.Series(ops_status_list).value_counts()
                 fig_ops_status, ax_ops_status = plt.subplots(figsize=(10, 9))
@@ -114,7 +114,7 @@ def main():
                 st.pyplot(fig_ops_status)
 
             # Position the pie chart for 'partner_id' in the second column
-            with col2:
+            # with col2:
                 st.write("## Top 10 Partner ID Pie Chart")
                 fig_partner_id, ax_partner_id = plt.subplots(figsize=(10, 9))
                 ax_partner_id.pie(partner_id_counts, labels=None, autopct='%1.1f%%', startangle=90)
