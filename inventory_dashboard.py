@@ -56,11 +56,11 @@ def fetch_distinct_values(column_name):
 # Main function to create the scorecard chart and other visualizations
 def main():
     # Universal filters
-    distinct_battery_capacities = fetch_distinct_values('battery_capacity')
-    battery_capacity = st.sidebar.multiselect('Select Battery Capacity', distinct_battery_capacities + ['All'])
+    # distinct_battery_capacities = fetch_distinct_values('battery_capacity')
+    # battery_capacity = st.sidebar.multiselect('Select Battery Capacity', distinct_battery_capacities + ['All'])
 
-    distinct_cities = fetch_distinct_values('deployed_city')
-    selected_cities = st.sidebar.multiselect('Select Deployed Cities', distinct_cities + ['All'])
+    # distinct_cities = fetch_distinct_values('deployed_city')
+    # selected_cities = st.sidebar.multiselect('Select Deployed Cities', distinct_cities + ['All'])
 
     # Fetch data from 'odoo_inventory' table for 'ops_status' with optional filters
     data_ops_status = fetch_data_from_supabase(['ops_status'])
