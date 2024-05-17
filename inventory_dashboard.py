@@ -1,4 +1,3 @@
-pip install plotly
 import psycopg2
 import pandas as pd
 import matplotlib.pyplot as plt
