@@ -90,6 +90,17 @@ def main():
             st.write("## Revenue Generation and Non-Revenue Generation Counts")
             st.write(df_counts)
 
+        # Display the pie charts
+        st.write("## Ops Status Pie Chart")
+        ops_status_counts = pd.Series(ops_status_list).value_counts()
+        fig_ops_status, ax_ops_status = plt.subplots(figsize=(10, 9))
+        ax_ops_status.pie(ops_status_counts, labels=None, autopct='%1.1f%%', startangle=90)
+        ax_ops_status.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+        plt.legend(ops_status_counts.index, loc="upper left", bbox_to_anchor=(1, 0.8))  # Place labels as legends and shift upwards
+        plt.tight_layout()  # Adjust layout to prevent label overlap
+        plt.rcParams['font.size'] = 12  # Adjust font size of labels
+        st.pyplot(fig_ops_status)
+
         # Fetch data from 'odoo_inventory' table for 'partner_id'
         data_partner_id = fetch_data_from_supabase(['partner_id'], battery_capacity if 'All' not in battery_capacity else None, selected_cities if 'All' not in selected_cities else None)
 
@@ -98,31 +109,15 @@ def main():
             partner_id_list = [item[0] for item in data_partner_id]
             partner_id_counts = pd.Series(partner_id_list).value_counts().head(10)
 
-            # Create columns to layout the charts
-            # col1, col2 = st.columns([1, 1])
-
-            # Position the pie chart for 'ops_status' in the first column
-            # with col1:
-                st.write("## Ops Status Pie Chart")
-                ops_status_counts = pd.Series(ops_status_list).value_counts()
-                fig_ops_status, ax_ops_status = plt.subplots(figsize=(10, 9))
-                ax_ops_status.pie(ops_status_counts, labels=None, autopct='%1.1f%%', startangle=90)
-                ax_ops_status.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
-                plt.legend(ops_status_counts.index, loc="upper left", bbox_to_anchor=(1, 0.8))  # Place labels as legends and shift upwards
-                plt.tight_layout()  # Adjust layout to prevent label overlap
-                plt.rcParams['font.size'] = 12  # Adjust font size of labels
-                st.pyplot(fig_ops_status)
-
-            # Position the pie chart for 'partner_id' in the second column
-            # with col2:
-                st.write("## Top 10 Partner ID Pie Chart")
-                fig_partner_id, ax_partner_id = plt.subplots(figsize=(10, 9))
-                ax_partner_id.pie(partner_id_counts, labels=None, autopct='%1.1f%%', startangle=90)
-                ax_partner_id.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
-                plt.legend(partner_id_counts.index, loc="upper left", bbox_to_anchor=(1, 0.8))  # Place labels as legends and shift upwards
-                plt.tight_layout()  # Adjust layout to prevent label overlap
-                plt.rcParams['font.size'] = 12  # Adjust font size of labels
-                st.pyplot(fig_partner_id)
+            # Display the pie chart for 'partner_id'
+            st.write("## Top 10 Partner ID Pie Chart")
+            fig_partner_id, ax_partner_id = plt.subplots(figsize=(10, 9))
+            ax_partner_id.pie(partner_id_counts, labels=None, autopct='%1.1f%%', startangle=90)
+            ax_partner_id.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+            plt.legend(partner_id_counts.index, loc="upper left", bbox_to_anchor=(1, 0.8))  # Place labels as legends and shift upwards
+            plt.tight_layout()  # Adjust layout to prevent label overlap
+            plt.rcParams['font.size'] = 12  # Adjust font size of labels
+            st.pyplot(fig_partner_id)
 
         # Fetch data for pivot table
         data_pivot = fetch_data_from_supabase(['deployed_city', 'ops_status'], battery_capacity if 'All' not in battery_capacity else None, selected_cities if 'All' not in selected_cities else None)
@@ -161,3 +156,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
