@@ -92,35 +92,15 @@ def main():
             st.write(df_counts)
 
         # Display the pie charts
-        # st.write("## Ops Status Pie Chart")
-        # ops_status_counts = pd.Series(ops_status_list).value_counts()
-        # fig_ops_status, ax_ops_status = plt.subplots(figsize=(10, 9))
-        # ax_ops_status.pie(ops_status_counts, labels=None, autopct='%1.1f%%', startangle=90)
-        # ax_ops_status.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
-        # plt.legend(ops_status_counts.index, loc="upper left", bbox_to_anchor=(1, 0.8))  # Place labels as legends and shift upwards
-        # plt.tight_layout()  # Adjust layout to prevent label overlap
-        # plt.rcParams['font.size'] = 12  # Adjust font size of labels
-        # st.pyplot(fig_ops_status)
-
-        # Assuming ops_status_list is your list of categories
+        st.write("## Ops Status Pie Chart")
         ops_status_counts = pd.Series(ops_status_list).value_counts()
-        
         fig_ops_status, ax_ops_status = plt.subplots(figsize=(10, 9))
         ax_ops_status.pie(ops_status_counts, labels=None, autopct='%1.1f%%', startangle=90)
         ax_ops_status.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+        plt.legend(ops_status_counts.index, loc="upper left", bbox_to_anchor=(1, 0.8))  # Place labels as legends and shift upwards
         plt.tight_layout()  # Adjust layout to prevent label overlap
         plt.rcParams['font.size'] = 12  # Adjust font size of labels
-        
-        # Convert matplotlib figure to plotly figure
-        fig_ops_status_plotly = px.get_figure_standalone(fig_ops_status)
-        
-        # Add hover information
-        for trace in fig_ops_status_plotly.data:
-            trace.hovertemplate = '<b>%{label}</b><br>%{percent}<br>%{value}'
-        
-        st.plotly_chart(fig_ops_status_plotly)
-
-        
+        st.pyplot(fig_ops_status)
 
         # Fetch data from 'odoo_inventory' table for 'partner_id'
         data_partner_id = fetch_data_from_supabase(['partner_id'], battery_capacity if 'All' not in battery_capacity else None, selected_cities if 'All' not in selected_cities else None)
