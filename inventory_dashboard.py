@@ -5,49 +5,26 @@ import streamlit as st
 
 # Function to fetch data from Supabase table
 def fetch_data_from_supabase(columns, filters):
-    try:
-        conn = psycopg2.connect(
-            database="postgres",
-            user='postgres.gqmpfexjoachyjgzkhdf',
-            password='Change@2015Log9',
-            host='aws-0-ap-south-1.pooler.supabase.com',
-            port='5432'
-        )
-        cursor = conn.cursor()
-        query = f"SELECT {', '.join(columns)} FROM odoo_inventory WHERE 1=1"
-        for column, values in filters.items():
-            if values:  # Apply filter only if there are selected values
-                if len(values) == 1:  # Handle single value case
-                    query += f" AND {column} = '{values[0]}'"
-                else:
-                    values = tuple(map(str, values))
-                    query += f" AND {column} IN {values}"
-        cursor.execute(query)
-        data = cursor.fetchall()
-        conn.close()
-        return data
-    except psycopg2.Error as e:
-        st.error(f"Error connecting to Supabase: {e}")
-        return None
+    # Your existing code for fetching data...
 
 # Function to fetch distinct values for a column from Supabase table
 def fetch_distinct_values(column_name):
-    try:
-        conn = psycopg2.connect(
-            database="postgres",
-            user='postgres.gqmpfexjoachyjgzkhdf',
-            password='Change@2015Log9',
-            host='aws-0-ap-south-1.pooler.supabase.com',
-            port='5432'
-        )
-        cursor = conn.cursor()
-        cursor.execute(f"SELECT DISTINCT {column_name} FROM odoo_inventory")
-        data = cursor.fetchall()
-        conn.close()
-        return [item[0] for item in data if item[0] is not None]  # Exclude None values
-    except psycopg2.Error as e:
-        st.error(f"Error connecting to Supabase: {e}")
-        return None
+    # Your existing code for fetching distinct values...
+
+# Function to map deployed cities to regions
+def get_region(city):
+    west_cities = ['MUMBAI', 'SURAT', 'PUNE', 'AHMEDABAD', 'VADODARA', 'NAGPUR']
+    north_cities = ['DELHI', 'LUCKNOW', 'KANPUR', 'JAIPUR', 'PRAYAGRAJ', 'Agra', 'VARANASI', 'Chandigarh', 'Panipat', 'Sonipath', 'KOLKATA']
+    south_cities = ['CHENNAI', 'BANGALORE', 'HYDERABAD', 'VIJAYAWADA', 'VIJAYWADA', 'KOCHI', 'COIMBATORE']
+    
+    if city in west_cities:
+        return 'West'
+    elif city in north_cities:
+        return 'North'
+    elif city in south_cities:
+        return 'South'
+    else:
+        return 'Not Known'
 
 # Main function to create the scorecard chart and other visualizations
 def main():
@@ -55,33 +32,18 @@ def main():
     distinct_battery_capacities = fetch_distinct_values('battery_capacity')
     battery_capacity = st.sidebar.multiselect('Select Battery Capacity', distinct_battery_capacities)
 
+    # Add Region filter
     distinct_cities = fetch_distinct_values('deployed_city')
     deployed_city = st.sidebar.multiselect('Select Deployed Cities', distinct_cities)
 
-    distinct_ops_status = fetch_distinct_values('ops_status')
-    ops_status = st.sidebar.multiselect('Select Ops Status', distinct_ops_status)
-
-    distinct_partner_ids = fetch_distinct_values('partner_id')
-    partner_id = st.sidebar.multiselect('Select Partner ID', distinct_partner_ids)
-
-    distinct_products = fetch_distinct_values('product')
-    product = st.sidebar.multiselect('Select Product', distinct_products)
-
-    distinct_chassis_numbers = fetch_distinct_values('chassis_number')
-    chassis_number = st.sidebar.multiselect('Select Chassis Number', distinct_chassis_numbers)
-
-    distinct_registration_numbers = fetch_distinct_values('registration_number')
-    registration_number = st.sidebar.multiselect('Select Registration Number', distinct_registration_numbers)
+    region_options = ['West', 'North', 'South', 'Not Known']
+    region = st.sidebar.multiselect('Select Region', region_options)
 
     # Create a dictionary to store all filters
     filters = {
         'battery_capacity': battery_capacity,
         'deployed_city': deployed_city,
-        'ops_status': ops_status,
-        'partner_id': partner_id,
-        'product': product,
-        'chassis_number': chassis_number,
-        'registration_number': registration_number,
+        'region': region,  # Add region filter
     }
 
     # Fetch data from 'odoo_inventory' table for 'ops_status' with optional filters
