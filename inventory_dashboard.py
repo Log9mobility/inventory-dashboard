@@ -2,7 +2,6 @@ import psycopg2
 import pandas as pd
 import matplotlib.pyplot as plt
 import streamlit as st
-import plotly.express as px
 
 # Function to fetch data from Supabase table
 def fetch_data_from_supabase(columns, battery_capacity=None, deployed_city=None):
@@ -61,7 +60,8 @@ def main():
     battery_capacity = st.sidebar.multiselect('Select Battery Capacity', distinct_battery_capacities + ['All'])
 
     distinct_cities = fetch_distinct_values('deployed_city')
-    selected_cities = st.sidebar.multiselect('Select Deployed Cities', distinct_cities + ['All'])
+    # Select all cities by default
+    selected_cities = st.sidebar.multiselect('Select Deployed Cities', distinct_cities + ['All'], default=distinct_cities)
 
     # Fetch data from 'odoo_inventory' table for 'ops_status' with optional filters
     data_ops_status = fetch_data_from_supabase(['ops_status'], battery_capacity if 'All' not in battery_capacity else None, selected_cities if 'All' not in selected_cities else None)
