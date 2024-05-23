@@ -57,14 +57,17 @@ def fetch_distinct_values(column_name):
 def main():
     # Universal filters
     distinct_battery_capacities = fetch_distinct_values('battery_capacity')
-    battery_capacity = st.sidebar.multiselect('Select Battery Capacity', distinct_battery_capacities + ['All'])
+    battery_capacity = st.sidebar.multiselect('Select Battery Capacity', distinct_battery_capacities + ['All'], default=['All'])
 
     distinct_cities = fetch_distinct_values('deployed_city')
-    # Select all cities by default
-    selected_cities = st.sidebar.multiselect('Select Deployed Cities', distinct_cities + ['All'], default=distinct_cities)
+    all_cities_option = ['All'] + distinct_cities
+    selected_cities = st.sidebar.multiselect('Select Deployed Cities', all_cities_option, default=['All'])
+
+    # Adjusting selection for SQL query
+    cities_to_query = None if 'All' in selected_cities else selected_cities
 
     # Fetch data from 'odoo_inventory' table for 'ops_status' with optional filters
-    data_ops_status = fetch_data_from_supabase(['ops_status'], battery_capacity if 'All' not in battery_capacity else None, selected_cities if 'All' not in selected_cities else None)
+    data_ops_status = fetch_data_from_supabase(['ops_status'], battery_capacity if 'All' not in battery_capacity else None, cities_to_query)
 
     if data_ops_status is not None:
         # Calculate counts for 'rev gen' and 'non rev gen'
@@ -103,7 +106,7 @@ def main():
         st.pyplot(fig_ops_status)
 
         # Fetch data from 'odoo_inventory' table for 'partner_id'
-        data_partner_id = fetch_data_from_supabase(['partner_id'], battery_capacity if 'All' not in battery_capacity else None, selected_cities if 'All' not in selected_cities else None)
+        data_partner_id = fetch_data_from_supabase(['partner_id'], battery_capacity if 'All' not in battery_capacity else None, cities_to_query)
 
         if data_partner_id is not None:
             # Count occurrences of each partner_id and select top 10
@@ -121,7 +124,7 @@ def main():
             st.pyplot(fig_partner_id)
 
         # Fetch data for pivot table
-        data_pivot = fetch_data_from_supabase(['deployed_city', 'ops_status'], battery_capacity if 'All' not in battery_capacity else None, selected_cities if 'All' not in selected_cities else None)
+        data_pivot = fetch_data_from_supabase(['deployed_city', 'ops_status'], battery_capacity if 'All' not in battery_capacity else None, cities_to_query)
 
         if data_pivot is not None:
             # Create DataFrame
@@ -133,7 +136,7 @@ def main():
             st.write(pivot_table)
 
         # Fetch data for partner_id count table
-        data_partner_id_count = fetch_data_from_supabase(['deployed_city', 'partner_id'], battery_capacity if 'All' not in battery_capacity else None, selected_cities if 'All' not in selected_cities else None)
+        data_partner_id_count = fetch_data_from_supabase(['deployed_city', 'partner_id'], battery_capacity if 'All' not in battery_capacity else None, cities_to_query)
 
         if data_partner_id_count is not None:
             # Create DataFrame
@@ -145,7 +148,7 @@ def main():
             st.write(partner_id_count_table)
 
         # Fetch data for pivot table
-        data_pivot = fetch_data_from_supabase(['deployed_city', 'chassis_number', 'partner_id', 'battery_capacity', 'ops_status'], battery_capacity if 'All' not in battery_capacity else None, selected_cities if 'All' not in selected_cities else None)
+        data_pivot = fetch_data_from_supabase(['deployed_city', 'chassis_number', 'partner_id', 'battery_capacity', 'ops_status'], battery_capacity if 'All' not in battery_capacity else None, cities_to_query)
 
         if data_pivot is not None:
             # Create DataFrame
