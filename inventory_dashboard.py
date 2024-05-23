@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import streamlit as st
 
 # Function to fetch data from Supabase table
-def fetch_data_from_supabase(columns, battery_capacity=None, deployed_city=None):
+def fetch_data_from_supabase(columns, filters):
     try:
         conn = psycopg2.connect(
             database="postgres",
@@ -15,17 +15,13 @@ def fetch_data_from_supabase(columns, battery_capacity=None, deployed_city=None)
         )
         cursor = conn.cursor()
         query = f"SELECT {', '.join(columns)} FROM odoo_inventory WHERE 1=1"
-        if battery_capacity and 'All' not in battery_capacity:
-            if len(battery_capacity) == 1:  # Handle single value case
-                query += f" AND battery_capacity = '{battery_capacity[0]}'"
-            else:
-                battery_capacity = tuple(map(str, battery_capacity))
-                query += f" AND battery_capacity IN {battery_capacity}"
-        if deployed_city and 'All' not in deployed_city:
-            if len(deployed_city) == 1:  # Handle single value case
-                query += f" AND deployed_city = '{deployed_city[0]}'"
-            else:
-                query += f" AND deployed_city IN {tuple(deployed_city)}"
+        for column, values in filters.items():
+            if values and 'All' not in values:
+                if len(values) == 1:  # Handle single value case
+                    query += f" AND {column} = '{values[0]}'"
+                else:
+                    values = tuple(map(str, values))
+                    query += f" AND {column} IN {values}"
         cursor.execute(query)
         data = cursor.fetchall()
         conn.close()
@@ -57,17 +53,39 @@ def fetch_distinct_values(column_name):
 def main():
     # Universal filters
     distinct_battery_capacities = fetch_distinct_values('battery_capacity')
-    battery_capacity = st.sidebar.multiselect('Select Battery Capacity', distinct_battery_capacities + ['All'], default=['All'])
+    battery_capacity = st.sidebar.multiselect('Select Battery Capacity', ['All'] + distinct_battery_capacities)
 
     distinct_cities = fetch_distinct_values('deployed_city')
-    all_cities_option = ['All'] + distinct_cities
-    selected_cities = st.sidebar.multiselect('Select Deployed Cities', all_cities_option, default=['All'])
+    deployed_city = st.sidebar.multiselect('Select Deployed Cities', ['All'] + distinct_cities)
 
-    # Adjusting selection for SQL query
-    cities_to_query = None if 'All' in selected_cities else selected_cities
+    distinct_ops_status = fetch_distinct_values('ops_status')
+    ops_status = st.sidebar.multiselect('Select Ops Status', ['All'] + distinct_ops_status)
+
+    distinct_partner_ids = fetch_distinct_values('partner_id')
+    partner_id = st.sidebar.multiselect('Select Partner ID', ['All'] + distinct_partner_ids)
+
+    distinct_products = fetch_distinct_values('product')
+    product = st.sidebar.multiselect('Select Product', ['All'] + distinct_products)
+
+    distinct_chassis_numbers = fetch_distinct_values('chassis_number')
+    chassis_number = st.sidebar.multiselect('Select Chassis Number', ['All'] + distinct_chassis_numbers)
+
+    distinct_registration_numbers = fetch_distinct_values('registration_number')
+    registration_number = st.sidebar.multiselect('Select Registration Number', ['All'] + distinct_registration_numbers)
+
+    # Create a dictionary to store all filters
+    filters = {
+        'battery_capacity': battery_capacity,
+        'deployed_city': deployed_city,
+        'ops_status': ops_status,
+        'partner_id': partner_id,
+        'product': product,
+        'chassis_number': chassis_number,
+        'registration_number': registration_number,
+    }
 
     # Fetch data from 'odoo_inventory' table for 'ops_status' with optional filters
-    data_ops_status = fetch_data_from_supabase(['ops_status'], battery_capacity if 'All' not in battery_capacity else None, cities_to_query)
+    data_ops_status = fetch_data_from_supabase(['ops_status'], filters)
 
     if data_ops_status is not None:
         # Calculate counts for 'rev gen' and 'non rev gen'
@@ -106,7 +124,7 @@ def main():
         st.pyplot(fig_ops_status)
 
         # Fetch data from 'odoo_inventory' table for 'partner_id'
-        data_partner_id = fetch_data_from_supabase(['partner_id'], battery_capacity if 'All' not in battery_capacity else None, cities_to_query)
+        data_partner_id = fetch_data_from_supabase(['partner_id'], filters)
 
         if data_partner_id is not None:
             # Count occurrences of each partner_id and select top 10
@@ -124,7 +142,7 @@ def main():
             st.pyplot(fig_partner_id)
 
         # Fetch data for pivot table
-        data_pivot = fetch_data_from_supabase(['deployed_city', 'ops_status'], battery_capacity if 'All' not in battery_capacity else None, cities_to_query)
+        data_pivot = fetch_data_from_supabase(['deployed_city', 'ops_status'], filters)
 
         if data_pivot is not None:
             # Create DataFrame
@@ -136,7 +154,7 @@ def main():
             st.write(pivot_table)
 
         # Fetch data for partner_id count table
-        data_partner_id_count = fetch_data_from_supabase(['deployed_city', 'partner_id'], battery_capacity if 'All' not in battery_capacity else None, cities_to_query)
+        data_partner_id_count = fetch_data_from_supabase(['deployed_city', 'partner_id'], filters)
 
         if data_partner_id_count is not None:
             # Create DataFrame
@@ -147,16 +165,16 @@ def main():
             st.write("## Table: Count of Deployed Cities Across Partner IDs")
             st.write(partner_id_count_table)
 
-        # Fetch data for pivot table
-        data_pivot = fetch_data_from_supabase(['deployed_city', 'chassis_number', 'partner_id', 'battery_capacity', 'ops_status'], battery_capacity if 'All' not in battery_capacity else None, cities_to_query)
+        # Fetch data for deployed assets table
+        data_deployed_assets = fetch_data_from_supabase(['deployed_city', 'chassis_number', 'partner_id', 'battery_capacity', 'ops_status'], filters)
 
-        if data_pivot is not None:
+        if data_deployed_assets is not None:
             # Create DataFrame
-            df_pivot = pd.DataFrame(data_pivot, columns=['deployed_city', 'chassis_number', 'partner_id', 'battery_capacity', 'ops_status'])
+            df_deployed_assets = pd.DataFrame(data_deployed_assets, columns=['deployed_city', 'chassis_number', 'partner_id', 'battery_capacity', 'ops_status'])
             
             # Display the table
             st.write("## Table: Deployed Assets Information")
-            st.write(df_pivot)
+            st.write(df_deployed_assets)
 
 if __name__ == "__main__":
     main()
