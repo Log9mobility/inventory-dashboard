@@ -3,6 +3,7 @@ import pandas as pd
 import plotly.express as px
 import streamlit as st
 
+# Update the fetch_data_from_supabase function to dynamically determine the index of the 'region' column
 def fetch_data_from_supabase(columns, filters):
     try:
         conn = psycopg2.connect(
@@ -22,13 +23,18 @@ def fetch_data_from_supabase(columns, filters):
                     values = tuple(map(str, values))
                     query += f" AND {column} IN {values}"
         cursor.execute(query)
+        
+        # Fetch column names
+        data_columns = [desc[0] for desc in cursor.description]
+        
         data = cursor.fetchall()
         conn.close()
         
         # Filter records based on 'region' in Python code
         region_values = filters.get('region', [])
         if region_values:
-            data = [row for row in data if row[0] in region_values]  # Assuming 'region' is the first column
+            region_index = data_columns.index('region')
+            data = [row for row in data if row[region_index] in region_values]
         
         return data
     except psycopg2.Error as e:
