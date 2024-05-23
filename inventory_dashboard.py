@@ -49,11 +49,33 @@ def fetch_distinct_values(column_name):
         st.error(f"Error connecting to Supabase: {e}")
         return None
 
+# Function to map deployed cities to regions
+def get_region(city):
+    west_cities = ['MUMBAI', 'SURAT', 'PUNE', 'AHMEDABAD', 'VADODARA', 'NAGPUR']
+    north_cities = ['DELHI', 'LUCKNOW', 'KANPUR', 'JAIPUR', 'PRAYAGRAJ', 'Agra', 'VARANASI', 'Chandigarh', 'Panipat', 'Sonipath', 'KOLKATA']
+    south_cities = ['CHENNAI', 'BANGALORE', 'HYDERABAD', 'VIJAYAWADA', 'VIJAYWADA', 'KOCHI', 'COIMBATORE']
+    
+    if city in west_cities:
+        return 'West'
+    elif city in north_cities:
+        return 'North'
+    elif city in south_cities:
+        return 'South'
+    else:
+        return 'Not Known'
+
 # Main function to create the scorecard chart and other visualizations
 def main():
     # Universal filters
     distinct_battery_capacities = fetch_distinct_values('battery_capacity')
     battery_capacity = st.sidebar.multiselect('Select Battery Capacity', distinct_battery_capacities)
+
+    # Add Region filter
+    distinct_cities = fetch_distinct_values('deployed_city')
+    deployed_city = st.sidebar.multiselect('Select Deployed Cities', distinct_cities)
+
+    region_options = ['West', 'North', 'South', 'Not Known']
+    region = st.sidebar.multiselect('Select Region', region_options)
 
     distinct_cities = fetch_distinct_values('deployed_city')
     deployed_city = st.sidebar.multiselect('Select Deployed Cities', distinct_cities)
@@ -76,6 +98,7 @@ def main():
     # Create a dictionary to store all filters
     filters = {
         'battery_capacity': battery_capacity,
+        'region': region,
         'deployed_city': deployed_city,
         'ops_status': ops_status,
         'partner_id': partner_id,
