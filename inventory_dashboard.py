@@ -117,8 +117,7 @@ def main():
         ops_status_counts = pd.Series(ops_status_list).value_counts()
         fig_ops_status = px.pie(ops_status_counts, values=ops_status_counts.values, names=ops_status_counts.index,
                                 title='Ops Status Distribution', hole=0.3)
-        fig_ops_status.update_traces(hoverinfo='name')
-        fig_ops_status.update_layout(legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1))
+        fig_ops_status.update_traces(hoverinfo='label+percent')
         st.plotly_chart(fig_ops_status)
 
         # Fetch data from 'odoo_inventory' table for 'partner_id'
@@ -133,9 +132,43 @@ def main():
             st.write("## Top 10 Partner ID Pie Chart")
             fig_partner_id = px.pie(partner_id_counts, values=partner_id_counts.values, names=partner_id_counts.index,
                                     title='Top 10 Partner ID Distribution', hole=0.3)
-            fig_partner_id.update_traces(hoverinfo='name')
-            fig_partner_id.update_layout(legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1))
+            fig_partner_id.update_traces(hoverinfo='label+percent')
             st.plotly_chart(fig_partner_id)
+
+        # Fetch data for pivot table
+        data_pivot = fetch_data_from_supabase(['deployed_city', 'ops_status'], filters)
+
+        if data_pivot is not None:
+            # Create DataFrame
+            df_pivot = pd.DataFrame(data_pivot, columns=['deployed_city', 'ops_status'])
+            # Pivot table
+            pivot_table = pd.pivot_table(df_pivot, index='deployed_city', columns='ops_status', aggfunc='size', fill_value=0)
+            # Display pivot table
+            st.write("## Pivot Table: Count of Ops Status Across Deployed Cities")
+            st.write(pivot_table)
+
+        # Fetch data for partner_id count table
+        data_partner_id_count = fetch_data_from_supabase(['deployed_city', 'partner_id'], filters)
+
+        if data_partner_id_count is not None:
+            # Create DataFrame
+            df_partner_id_count = pd.DataFrame(data_partner_id_count, columns=['deployed_city', 'partner_id'])
+            # Group by partner_id and count deployed_city
+            partner_id_count_table = df_partner_id_count.groupby('partner_id')['deployed_city'].value_counts().unstack(fill_value=0)
+            # Display partner_id count table
+            st.write("## Table: Count of Deployed Cities Across Partner IDs")
+            st.write(partner_id_count_table)
+
+        # Fetch data for deployed assets table
+        data_deployed_assets = fetch_data_from_supabase(['deployed_city', 'chassis_number', 'partner_id', 'battery_capacity', 'ops_status'], filters)
+
+        if data_deployed_assets is not None:
+            # Create DataFrame
+            df_deployed_assets = pd.DataFrame(data_deployed_assets, columns=['deployed_city', 'chassis_number', 'partner_id', 'battery_capacity', 'ops_status'])
+            
+            # Display the table
+            st.write("## Table: Deployed Assets Information")
+            st.write(df_deployed_assets)
 
 if __name__ == "__main__":
     main()
