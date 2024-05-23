@@ -29,6 +29,11 @@ def fetch_data_from_supabase(columns, filters):
         region_values = filters.get('region', [])
         if region_values:
             data = [row for row in data if row[0] in region_values]  # Assuming 'region' is the first column
+            
+        # Debug output to check the data retrieved from Supabase
+        st.write("## Debug: Data Retrieved from Supabase")
+        st.write(data)
+        
         return data
     except psycopg2.Error as e:
         st.error(f"Error connecting to Supabase: {e}")
