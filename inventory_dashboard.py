@@ -117,7 +117,7 @@ def main():
         ops_status_counts = pd.Series(ops_status_list).value_counts()
         fig_ops_status = px.pie(ops_status_counts, values=ops_status_counts.values, names=ops_status_counts.index,
                                 title='Ops Status Distribution', hole=0.3)
-        fig_ops_status.update_traces(textinfo='percent+label', hoverinfo='label+percent')
+        fig_ops_status.update_traces( hoverinfo='label+percent')
         st.plotly_chart(fig_ops_status)
 
         # Fetch data from 'odoo_inventory' table for 'partner_id'
@@ -132,7 +132,7 @@ def main():
             st.write("## Top 10 Partner ID Pie Chart")
             fig_partner_id = px.pie(partner_id_counts, values=partner_id_counts.values, names=partner_id_counts.index,
                                     title='Top 10 Partner ID Distribution', hole=0.3)
-            fig_partner_id.update_traces(textinfo='percent+label', hoverinfo='label+percent')
+            fig_partner_id.update_traces( hoverinfo='label+percent')
             st.plotly_chart(fig_partner_id)
 
         # Fetch data for pivot table
