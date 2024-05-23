@@ -77,9 +77,6 @@ def main():
     region_options = ['West', 'North', 'South', 'Not Known']
     region = st.sidebar.multiselect('Select Region', region_options)
 
-    distinct_cities = fetch_distinct_values('deployed_city')
-    deployed_city = st.sidebar.multiselect('Select Deployed Cities', distinct_cities)
-
     distinct_ops_status = fetch_distinct_values('ops_status')
     ops_status = st.sidebar.multiselect('Select Ops Status', distinct_ops_status)
 
