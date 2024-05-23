@@ -16,7 +16,7 @@ def fetch_data_from_supabase(columns, filters):
         cursor = conn.cursor()
         query = f"SELECT {', '.join(columns)} FROM odoo_inventory WHERE 1=1"
         for column, values in filters.items():
-            if values and 'All' not in values:
+            if values:  # Apply filter only if there are selected values
                 if len(values) == 1:  # Handle single value case
                     query += f" AND {column} = '{values[0]}'"
                 else:
@@ -53,25 +53,25 @@ def fetch_distinct_values(column_name):
 def main():
     # Universal filters
     distinct_battery_capacities = fetch_distinct_values('battery_capacity')
-    battery_capacity = st.sidebar.multiselect('Select Battery Capacity', ['All'] + distinct_battery_capacities, default=['All'])
+    battery_capacity = st.sidebar.multiselect('Select Battery Capacity', distinct_battery_capacities)
 
     distinct_cities = fetch_distinct_values('deployed_city')
-    deployed_city = st.sidebar.multiselect('Select Deployed Cities', ['All'] + distinct_cities, default=['All'])
+    deployed_city = st.sidebar.multiselect('Select Deployed Cities', distinct_cities)
 
     distinct_ops_status = fetch_distinct_values('ops_status')
-    ops_status = st.sidebar.multiselect('Select Ops Status', ['All'] + distinct_ops_status, default=['All'])
+    ops_status = st.sidebar.multiselect('Select Ops Status', distinct_ops_status)
 
     distinct_partner_ids = fetch_distinct_values('partner_id')
-    partner_id = st.sidebar.multiselect('Select Partner ID', ['All'] + distinct_partner_ids, default=['All'])
+    partner_id = st.sidebar.multiselect('Select Partner ID', distinct_partner_ids)
 
     distinct_products = fetch_distinct_values('product')
-    product = st.sidebar.multiselect('Select Product', ['All'] + distinct_products, default=['All'])
+    product = st.sidebar.multiselect('Select Product', distinct_products)
 
     distinct_chassis_numbers = fetch_distinct_values('chassis_number')
-    chassis_number = st.sidebar.multiselect('Select Chassis Number', ['All'] + distinct_chassis_numbers, default=['All'])
+    chassis_number = st.sidebar.multiselect('Select Chassis Number', distinct_chassis_numbers)
 
     distinct_registration_numbers = fetch_distinct_values('registration_number')
-    registration_number = st.sidebar.multiselect('Select Registration Number', ['All'] + distinct_registration_numbers, default=['All'])
+    registration_number = st.sidebar.multiselect('Select Registration Number', distinct_registration_numbers)
 
     # Create a dictionary to store all filters
     filters = {
