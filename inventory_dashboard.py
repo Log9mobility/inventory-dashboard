@@ -3,7 +3,6 @@ import pandas as pd
 import plotly.express as px
 import streamlit as st
 
-# Function to fetch data from Supabase table
 def fetch_data_from_supabase(columns, filters):
     try:
         conn = psycopg2.connect(
@@ -16,8 +15,8 @@ def fetch_data_from_supabase(columns, filters):
         cursor = conn.cursor()
         query = f"SELECT {', '.join(columns)} FROM odoo_inventory WHERE 1=1"
         for column, values in filters.items():
-            if values:  # Apply filter only if there are selected values
-                if len(values) == 1:  # Handle single value case
+            if values and column != 'region':  # Skip 'region' filter here
+                if len(values) == 1:
                     query += f" AND {column} = '{values[0]}'"
                 else:
                     values = tuple(map(str, values))
@@ -25,6 +24,11 @@ def fetch_data_from_supabase(columns, filters):
         cursor.execute(query)
         data = cursor.fetchall()
         conn.close()
+        
+        # Filter records based on 'region' in Python code
+        region_values = filters.get('region', [])
+        if region_values:
+            data = [row for row in data if row[0] in region_values]  # Assuming 'region' is the first column
         return data
     except psycopg2.Error as e:
         st.error(f"Error connecting to Supabase: {e}")
