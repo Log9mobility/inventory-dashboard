@@ -93,9 +93,6 @@ def main():
     distinct_ops_status = fetch_distinct_values('ops_status')
     ops_status = st.sidebar.multiselect('Select Ops Status', distinct_ops_status)
 
-    distinct_products = fetch_distinct_values('product')
-    product = st.sidebar.multiselect('Select Product', distinct_products)
-
     distinct_partner_ids = fetch_distinct_values('partner_id')
     partner_id = st.sidebar.multiselect('Select Partner ID', distinct_partner_ids)
 
@@ -112,7 +109,6 @@ def main():
         'deployed_city': deployed_city,
         'ops_status': ops_status,
         'partner_id': partner_id,
-        'product': product,
         'chassis_number': chassis_number,
         'registration_number': registration_number,
     }
