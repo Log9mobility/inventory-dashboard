@@ -6,37 +6,36 @@ import streamlit as st
 # Update the fetch_data_from_supabase function to dynamically determine the index of the 'region' column
 def fetch_data_from_supabase(columns, filters):
     try:
-        conn = psycopg2.connect(
+        with psycopg2.connect(
             database="postgres",
             user='postgres.gqmpfexjoachyjgzkhdf',
             password='Change@2015Log9',
             host='aws-0-ap-south-1.pooler.supabase.com',
             port='5432'
-        )
-        cursor = conn.cursor()
-        query = f"SELECT {', '.join(columns)} FROM odoo_inventory WHERE 1=1"
-        for column, values in filters.items():
-            if values and column != 'region':  # Skip 'region' filter here
-                if len(values) == 1:
-                    query += f" AND {column} = '{values[0]}'"
-                else:
-                    values = tuple(map(str, values))
-                    query += f" AND {column} IN {values}"
-        cursor.execute(query)
-        
-        # Fetch column names
-        data_columns = [desc[0] for desc in cursor.description]
-        
-        data = cursor.fetchall()
-        conn.close()
-        
-        # Filter records based on 'region' in Python code
-        region_values = filters.get('region', [])
-        if region_values:
-            region_index = data_columns.index('region')
-            data = [row for row in data if row[region_index] in region_values]
-        
-        return data
+        ) as conn:
+            with conn.cursor() as cursor:
+                query = f"SELECT {', '.join(columns)} FROM odoo_inventory WHERE 1=1"
+                for column, values in filters.items():
+                    if values and column != 'region':  # Skip 'region' filter here
+                        if len(values) == 1:
+                            query += f" AND {column} = '{values[0]}'"
+                        else:
+                            values = tuple(map(str, values))
+                            query += f" AND {column} IN {values}"
+                cursor.execute(query)
+                
+                # Fetch column names
+                data_columns = [desc[0] for desc in cursor.description]
+                
+                data = cursor.fetchall()
+                
+                # Filter records based on 'region' in Python code
+                region_values = filters.get('region', [])
+                if region_values:
+                    region_index = data_columns.index('region')
+                    data = [row for row in data if row[region_index] in region_values]
+                
+                return data
     except psycopg2.Error as e:
         st.error(f"Error connecting to Supabase: {e}")
         return None
@@ -44,18 +43,17 @@ def fetch_data_from_supabase(columns, filters):
 # Function to fetch distinct values for a column from Supabase table
 def fetch_distinct_values(column_name):
     try:
-        conn = psycopg2.connect(
+        with psycopg2.connect(
             database="postgres",
             user='postgres.gqmpfexjoachyjgzkhdf',
             password='Change@2015Log9',
             host='aws-0-ap-south-1.pooler.supabase.com',
             port='5432'
-        )
-        cursor = conn.cursor()
-        cursor.execute(f"SELECT DISTINCT {column_name} FROM odoo_inventory")
-        data = cursor.fetchall()
-        conn.close()
-        return [item[0] for item in data if item[0] is not None]  # Exclude None values
+        ) as conn:
+            with conn.cursor() as cursor:
+                cursor.execute(f"SELECT DISTINCT {column_name} FROM odoo_inventory")
+                data = cursor.fetchall()
+                return [item[0] for item in data if item[0] is not None]  # Exclude None values
     except psycopg2.Error as e:
         st.error(f"Error connecting to Supabase: {e}")
         return None
@@ -63,7 +61,7 @@ def fetch_distinct_values(column_name):
 # Function to map deployed cities to regions
 def get_region(city):
     west_cities = ['MUMBAI', 'SURAT', 'PUNE', 'AHMEDABAD', 'VADODARA', 'NAGPUR']
-    north_cities = ['DELHI', 'LUCKNOW', 'KANPUR', 'JAIPUR', 'PRAYAGRAJ', 'Agra', 'VARANASI', 'Chandigarh', 'Panipat', 'Sonipath', 'KOLKATA']
+    north_cities = ['DELHI', 'LUCKNOW', 'KANPUR', 'JAIPUR', 'PRAYAGRAJ', 'AGRA', 'VARANASI', 'CHANDIGARH', 'PANIPAT', 'SONIPATH', 'KOLKATA']
     south_cities = ['CHENNAI', 'BANGALORE', 'HYDERABAD', 'VIJAYAWADA', 'VIJAYWADA', 'KOCHI', 'COIMBATORE']
     
     if city in west_cities:
@@ -86,9 +84,14 @@ def main():
     deployed_city = st.sidebar.multiselect('Select Deployed Cities', distinct_cities)
 
     region_options = ['West', 'North', 'South', 'Not Known']
-    region = st.sidebar.multiselect('Select Region', region_options)
-# Map deployed cities to regions
-    region = [get_region(city) for city in deployed_city]
+    selected_regions = st.sidebar.multiselect('Select Region', region_options)
+    
+    # Map deployed cities to regions and filter if both filters are used
+    regions = []
+    if deployed_city:
+        regions = [get_region(city) for city in deployed_city]
+    if selected_regions:
+        regions = [region for region in regions if region in selected_regions]
     
     distinct_ops_status = fetch_distinct_values('ops_status')
     ops_status = st.sidebar.multiselect('Select Ops Status', distinct_ops_status)
@@ -105,7 +108,7 @@ def main():
     # Create a dictionary to store all filters
     filters = {
         'battery_capacity': battery_capacity,
-        'region': region,
+        'region': regions,
         'deployed_city': deployed_city,
         'ops_status': ops_status,
         'partner_id': partner_id,
