@@ -96,9 +96,6 @@ def main():
     distinct_partner_ids = fetch_distinct_values('partner_id')
     partner_id = st.sidebar.multiselect('Select Partner ID', distinct_partner_ids)
 
-    distinct_products = fetch_distinct_values('product')
-    product = st.sidebar.multiselect('Select Product', distinct_products)
-
     distinct_chassis_numbers = fetch_distinct_values('chassis_number')
     chassis_number = st.sidebar.multiselect('Select Chassis Number', distinct_chassis_numbers)
 
