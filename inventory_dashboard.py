@@ -51,8 +51,8 @@ def fetch_distinct_values(column_name):
 # Function to map deployed cities to regions
 def get_region(city):
     west_cities = ['MUMBAI', 'SURAT', 'PUNE', 'AHMEDABAD', 'VADODARA', 'NAGPUR']
-    north_cities = ['DELHI', 'LUCKNOW', 'KANPUR', 'JAIPUR', 'PRAYAGRAJ', 'AGRA', 'VARANASI', 'CHANDIGARH', 'PANIPAT', 'SONIPATH', 'KOLKATA']
-    south_cities = ['CHENNAI', 'BANGALORE', 'HYDERABAD', 'VIJAYAWADA', 'VIJAYWADA', 'KOCHI', 'COIMBATORE']
+    north_cities = ['DELHI', 'LUCKNOW', 'KANPUR', 'JAIPUR', 'PRAYAGRAJ', 'AGRA','Agra', 'VARANASI', 'CHANDIGARH','Chandigarh', 'PANIPAT','Panipat', 'Sonipath', 'KOLKATA']
+    south_cities = ['CHENNAI', 'BANGALORE', 'HYDERABAD', 'VIJAYAWADA', 'VIJAYWADA', 'KOCHI', 'COIMBATORE','Pondicherry']
     
     if city in west_cities:
         return 'West'
