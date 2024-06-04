@@ -93,7 +93,7 @@ def main():
     distinct_ops_status = fetch_distinct_values('ops_status')
     ops_status = st.sidebar.multiselect('Select Ops Status', distinct_ops_status)
 
-     distinct_products = fetch_distinct_values('product')
+    distinct_products = fetch_distinct_values('product')
     product = st.sidebar.multiselect('Select Product', distinct_products)
 
     distinct_partner_ids = fetch_distinct_values('partner_id')
