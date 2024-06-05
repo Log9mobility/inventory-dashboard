@@ -148,7 +148,7 @@ def main():
     data_columns, data_ops_status = fetch_data_from_supabase(['deployed_city', 'ops_status'], filters)
 
     if data_ops_status is not None:
-        # Normalize ops_status values
+                # Normalize ops_status values
         data_ops_status = [(row[0], normalize_ops_status(row[1])) for row in data_ops_status]
         
         # Remove 'DEALER STOCK' and 'REPLACED & RCA PARTS' entries
@@ -172,6 +172,15 @@ def main():
             'Category': ['Rev Gen', 'Non Rev Gen', 'Total'],
             'Count': [rev_gen_count, non_rev_gen_count, total_count]
         })
+
+        # Display the %Utilization and revenue generation count in two columns at the top of the page
+        col1, col2 = st.columns([1, 1])
+        with col1:
+            st.write("## %Utilization")
+            st.write(f"{utilization_percentage:.2f}%")
+        with col2:
+            st.write("## Revenue Generation and Non-Revenue Generation Counts")
+            st.write(df_counts)
 
         # Calculate %Utilization for each region
         region_utilization = calculate_region_utilization(data_ops_status, selected_regions)
@@ -260,7 +269,7 @@ def main():
             if selected_regions:
                 data_deployed_assets = [row for row in data_deployed_assets if get_region(row[data_columns.index('deployed_city')]) in selected_regions]
 
-            # Create DataFrame
+                        # Create DataFrame
             df_deployed_assets = pd.DataFrame(data_deployed_assets, columns=['deployed_city', 'chassis_number', 'partner_id', 'battery_capacity', 'ops_status'])
             
             # Display the table
@@ -269,5 +278,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
 
