@@ -235,8 +235,7 @@ def main():
                 data_partner_id_count = [row for row in data_partner_id_count if get_region(row[data_columns.index('deployed_city')]) in selected_regions]
 
             # Create DataFrame
-            df_partner_id_count
-                        = pd.DataFrame(data_partner_id_count, columns=['deployed_city', 'partner_id'])
+            df_partner_id_count = pd.DataFrame(data_partner_id_count, columns=['deployed_city', 'partner_id'])
             # Group by partner_id and count deployed_city
             partner_id_count_table = df_partner_id_count.groupby('partner_id')['deployed_city'].value_counts().unstack(fill_value=0)
             # Display partner_id count table
