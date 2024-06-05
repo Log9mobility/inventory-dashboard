@@ -94,11 +94,19 @@ def calculate_region_utilization(data_ops_status, selected_regions):
                 region_counts[region]['rev_gen'] += 1
 
     region_utilization = {}
+    overall_rev_gen = 0
+    overall_total = 0
+
     for region, counts in region_counts.items():
         total = counts['total']
         rev_gen = counts['rev_gen']
+        overall_rev_gen += rev_gen
+        overall_total += total
         utilization = (rev_gen / total * 100) if total > 0 else 0
-        region_utilization[region] = utilization
+        region_utilization[region] = f"{utilization:.2f}%"
+
+    overall_utilization = (overall_rev_gen / overall_total * 100) if overall_total > 0 else 0
+    region_utilization['Overall'] = f"{overall_utilization:.2f}%"
 
     return region_utilization
 
