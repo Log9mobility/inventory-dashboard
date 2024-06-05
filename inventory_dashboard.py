@@ -79,6 +79,23 @@ def normalize_ops_status(status):
     }
     return normalization_dict.get(status, status)
 
+# Calculate %Utilization for each region
+def calculate_region_utilization(data, selected_regions):
+    region_counts = {region: 0 for region in selected_regions}
+    total_counts = {region: 0 for region in selected_regions}
+
+    for row in data:
+        city = row[0]
+        status = normalize_ops_status(row[1])
+        region = get_region(city)
+        if region in selected_regions:
+            total_counts[region] += 1
+            if status in ['RENTAL', 'PORTER']:
+                region_counts[region] += 1
+    
+    utilization = {region: (region_counts[region] / total_counts[region]) * 100 if total_counts[region] != 0 else 0 for region in selected_regions}
+    return utilization
+
 # Main function to create the scorecard chart and other visualizations
 def main():
     # Universal filters
@@ -218,7 +235,8 @@ def main():
                 data_partner_id_count = [row for row in data_partner_id_count if get_region(row[data_columns.index('deployed_city')]) in selected_regions]
 
             # Create DataFrame
-            df_partner_id_count = pd.DataFrame(data_partner_id_count, columns=['deployed_city', 'partner_id'])
+            df_partner_id_count
+                        = pd.DataFrame(data_partner_id_count, columns=['deployed_city', 'partner_id'])
             # Group by partner_id and count deployed_city
             partner_id_count_table = df_partner_id_count.groupby('partner_id')['deployed_city'].value_counts().unstack(fill_value=0)
             # Display partner_id count table
@@ -248,3 +266,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+
