@@ -75,28 +75,33 @@ def normalize_ops_status(status):
         'STOCK':'REGISTERED INVENTORY',
         'TR EXPIRED': 'UNREGISTERED INVENTORY',
         'UNREGISTERED INVENTORY': 'UNREGISTERED INVENTORY'
-    
     }
     return normalization_dict.get(status, status)
 
-# Calculate %Utilization for each region
-def calculate_region_utilization(data, selected_regions):
-    region_counts = {region: 0 for region in selected_regions}
-    total_counts = {region: 0 for region in selected_regions}
+def calculate_region_utilization(data_ops_status, selected_regions):
+    region_counts = {'West': {'rev_gen': 0, 'total': 0},
+                     'North': {'rev_gen': 0, 'total': 0},
+                     'South': {'rev_gen': 0, 'total': 0},
+                     'Not Known': {'rev_gen': 0, 'total': 0}}
 
-    for row in data:
+    for row in data_ops_status:
         city = row[0]
-        status = normalize_ops_status(row[1])
+        status = row[1]
         region = get_region(city)
-        if region in selected_regions:
-            total_counts[region] += 1
+        if not selected_regions or region in selected_regions:
+            region_counts[region]['total'] += 1
             if status in ['RENTAL', 'PORTER']:
-                region_counts[region] += 1
-    
-    utilization = {region: (region_counts[region] / total_counts[region]) * 100 if total_counts[region] != 0 else 0 for region in selected_regions}
-    return utilization
+                region_counts[region]['rev_gen'] += 1
 
-# Main function to create the scorecard chart and other visualizations
+    region_utilization = {}
+    for region, counts in region_counts.items():
+        total = counts['total']
+        rev_gen = counts['rev_gen']
+        utilization = (rev_gen / total * 100) if total > 0 else 0
+        region_utilization[region] = utilization
+
+    return region_utilization
+
 def main():
     # Universal filters
     distinct_battery_capacities = fetch_distinct_values('battery_capacity')
@@ -174,8 +179,8 @@ def main():
 
         # Display the %Utilization for each region
         st.write("## %Utilization by Region")
-        for region, utilization in region_utilization.items():
-            st.write(f"{region}: {utilization:.2f}%")
+        region_utilization_df = pd.DataFrame(list(region_utilization.items()), columns=['Region', '%Utilization'])
+        st.write(region_utilization_df)
 
         # Display the pie chart for ops_status
         st.write("## Ops Status Pie Chart")
@@ -265,6 +270,5 @@ def main():
 
 if __name__ == "__main__":
     main()
-
 
 
