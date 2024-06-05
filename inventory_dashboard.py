@@ -180,7 +180,7 @@ def main():
         # Display the %Utilization for each region
         st.write("## %Utilization by Region")
         region_utilization_df = pd.DataFrame(list(region_utilization.items()), columns=['Region', '%Utilization'])
-        st.write(region_utilization_df)
+        st.write(region_utilization_df.T)  # Transpose the DataFrame to switch rows and columns
 
         # Display the pie chart for ops_status
         st.write("## Ops Status Pie Chart")
@@ -270,5 +270,4 @@ def main():
 
 if __name__ == "__main__":
     main()
-
 
