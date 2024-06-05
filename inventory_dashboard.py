@@ -115,8 +115,8 @@ def main():
         # Normalize ops_status values
         data_ops_status = [(row[0], normalize_ops_status(row[1])) for row in data_ops_status]
         
-        # Remove 'DEALER STOCK' entries
-        data_ops_status = [row for row in data_ops_status if row[1] != 'DEALER STOCK']
+        # Remove 'DEALER STOCK' and 'REPLACED & RCA PARTS' entries
+        data_ops_status = [row for row in data_ops_status if row[1] not in ['DEALER STOCK', 'REPLACED & RCA PARTS']]
 
         # Filter based on selected regions
         if selected_regions:
@@ -180,8 +180,8 @@ def main():
             # Normalize ops_status values
             data_pivot = [(row[0], normalize_ops_status(row[1])) for row in data_pivot]
             
-            # Remove 'DEALER STOCK' entries
-            data_pivot = [row for row in data_pivot if row[1] != 'DEALER STOCK']
+            # Remove 'DEALER STOCK' and 'REPLACED & RCA PARTS' entries
+            data_pivot = [row for row in data_pivot if row[1] not in ['DEALER STOCK', 'REPLACED & RCA PARTS']]
 
             # Filter based on selected regions
             if selected_regions:
@@ -218,8 +218,8 @@ def main():
             # Normalize ops_status values
             data_deployed_assets = [(row[0], row[1], row[2], row[3], normalize_ops_status(row[4])) for row in data_deployed_assets]
             
-            # Remove 'DEALER STOCK' entries
-            data_deployed_assets = [row for row in data_deployed_assets if row[4] != 'DEALER STOCK']
+            # Remove 'DEALER STOCK' and 'REPLACED & RCA PARTS' entries
+            data_deployed_assets = [row for row in data_deployed_assets if row[4] not in ['DEALER STOCK', 'REPLACED & RCA PARTS']]
 
             # Filter based on selected regions
             if selected_regions:
