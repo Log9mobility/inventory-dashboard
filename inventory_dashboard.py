@@ -173,15 +173,6 @@ def main():
             'Count': [rev_gen_count, non_rev_gen_count, total_count]
         })
 
-        # Display the %Utilization and revenue generation count in two columns at the top of the page
-        col1, col2 = st.columns([1, 1])
-        with col1:
-            st.write("## %Utilization")
-            st.write(f"{utilization_percentage:.2f}%")
-        with col2:
-            st.write("## Revenue Generation and Non-Revenue Generation Counts")
-            st.write(df_counts)
-
         # Calculate %Utilization for each region
         region_utilization = calculate_region_utilization(data_ops_status, selected_regions)
 
@@ -278,4 +269,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
