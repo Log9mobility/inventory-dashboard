@@ -70,6 +70,12 @@ def normalize_ops_status(status):
         'PILOT VEHICLES': 'PILOT',
         'IOD': 'IOD',
         'IOD VEHICLES': 'IOD'
+        'REGISTERED INVENTORY': 'REGISTERED INVENTORY',
+        'REGISTERED VEHICLES STOCK': 'REGISTERED INVENTORY',
+        'STOCK':'REGISTERED INVENTORY',
+        'TR EXPIRED': 'UNREGISTERED INVENTORY'
+        'UNREGISTERED INVENTORY': 'UNREGISTERED INVENTORY',
+    
     }
     return normalization_dict.get(status, status)
 
@@ -116,7 +122,7 @@ def main():
         data_ops_status = [(row[0], normalize_ops_status(row[1])) for row in data_ops_status]
         
         # Remove 'DEALER STOCK' and 'REPLACED & RCA PARTS' entries
-        data_ops_status = [row for row in data_ops_status if row[1] not in ['DEALER STOCK', 'REPLACED & RCA PARTS']]
+        data_ops_status = [row for row in data_ops_status if row[1] not in ['DEALER STOCK', 'REPLACED & RCA PARTS','INPUT','QUALITY CONTROL']]
 
         # Filter based on selected regions
         if selected_regions:
@@ -181,7 +187,7 @@ def main():
             data_pivot = [(row[0], normalize_ops_status(row[1])) for row in data_pivot]
             
             # Remove 'DEALER STOCK' and 'REPLACED & RCA PARTS' entries
-            data_pivot = [row for row in data_pivot if row[1] not in ['DEALER STOCK', 'REPLACED & RCA PARTS']]
+            data_pivot = [row for row in data_pivot if row[1] not in ['DEALER STOCK', 'REPLACED & RCA PARTS','INPUT','QUALITY CONTROL']]
 
             # Filter based on selected regions
             if selected_regions:
