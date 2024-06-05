@@ -114,6 +114,9 @@ def main():
     if data_ops_status is not None:
         # Normalize ops_status values
         data_ops_status = [(row[0], normalize_ops_status(row[1])) for row in data_ops_status]
+        
+        # Remove 'DEALER STOCK' entries
+        data_ops_status = [row for row in data_ops_status if row[1] != 'DEALER STOCK']
 
         # Filter based on selected regions
         if selected_regions:
@@ -176,6 +179,9 @@ def main():
         if data_pivot is not None:
             # Normalize ops_status values
             data_pivot = [(row[0], normalize_ops_status(row[1])) for row in data_pivot]
+            
+            # Remove 'DEALER STOCK' entries
+            data_pivot = [row for row in data_pivot if row[1] != 'DEALER STOCK']
 
             # Filter based on selected regions
             if selected_regions:
@@ -209,6 +215,12 @@ def main():
         data_columns, data_deployed_assets = fetch_data_from_supabase(['deployed_city', 'chassis_number', 'partner_id', 'battery_capacity', 'ops_status'], filters)
 
         if data_deployed_assets is not None:
+            # Normalize ops_status values
+            data_deployed_assets = [(row[0], row[1], row[2], row[3], normalize_ops_status(row[4])) for row in data_deployed_assets]
+            
+            # Remove 'DEALER STOCK' entries
+            data_deployed_assets = [row for row in data_deployed_assets if row[4] != 'DEALER STOCK']
+
             # Filter based on selected regions
             if selected_regions:
                 data_deployed_assets = [row for row in data_deployed_assets if get_region(row[data_columns.index('deployed_city')]) in selected_regions]
