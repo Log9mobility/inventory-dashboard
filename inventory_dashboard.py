@@ -3,7 +3,7 @@ import pandas as pd
 import plotly.express as px
 import streamlit as st
 
-# Update the fetch_data_from_supabase function to not consider 'region' column
+@st.cache_data(ttl=600)
 def fetch_data_from_supabase(columns, filters):
     try:
         with psycopg2.connect(
@@ -30,7 +30,7 @@ def fetch_data_from_supabase(columns, filters):
         st.error(f"Error connecting to Supabase: {e}")
         return None, None
 
-# Function to fetch distinct values for a column from Supabase table
+@st.cache_data(ttl=600)
 def fetch_distinct_values(column_name):
     try:
         with psycopg2.connect(
@@ -51,8 +51,8 @@ def fetch_distinct_values(column_name):
 # Function to map deployed cities to regions
 def get_region(city):
     west_cities = ['MUMBAI', 'SURAT', 'PUNE', 'AHMEDABAD', 'VADODARA', 'NAGPUR']
-    north_cities = ['DELHI', 'LUCKNOW', 'KANPUR', 'JAIPUR', 'PRAYAGRAJ', 'AGRA','Agra', 'VARANASI', 'CHANDIGARH','Chandigarh', 'PANIPAT','Panipat', 'Sonipath', 'KOLKATA']
-    south_cities = ['CHENNAI', 'BANGALORE', 'HYDERABAD', 'VIJAYAWADA', 'VIJAYWADA', 'KOCHI', 'COIMBATORE','Pondicherry']
+    north_cities = ['DELHI', 'LUCKNOW', 'KANPUR', 'JAIPUR', 'PRAYAGRAJ', 'AGRA', 'Agra', 'VARANASI', 'CHANDIGARH', 'Chandigarh', 'PANIPAT', 'Panipat', 'Sonipath', 'KOLKATA']
+    south_cities = ['CHENNAI', 'BANGALORE', 'HYDERABAD', 'VIJAYAWADA', 'VIJAYWADA', 'KOCHI', 'COIMBATORE', 'Pondicherry']
     
     if city in west_cities:
         return 'West'
@@ -234,4 +234,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
