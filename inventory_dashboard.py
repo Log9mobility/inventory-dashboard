@@ -69,12 +69,12 @@ def normalize_ops_status(status):
         'PILOT': 'PILOT',
         'PILOT VEHICLES': 'PILOT',
         'IOD': 'IOD',
-        'IOD VEHICLES': 'IOD'
+        'IOD VEHICLES': 'IOD',
         'REGISTERED INVENTORY': 'REGISTERED INVENTORY',
         'REGISTERED VEHICLES STOCK': 'REGISTERED INVENTORY',
         'STOCK':'REGISTERED INVENTORY',
-        'TR EXPIRED': 'UNREGISTERED INVENTORY'
-        'UNREGISTERED INVENTORY': 'UNREGISTERED INVENTORY',
+        'TR EXPIRED': 'UNREGISTERED INVENTORY',
+        'UNREGISTERED INVENTORY': 'UNREGISTERED INVENTORY'
     
     }
     return normalization_dict.get(status, status)
