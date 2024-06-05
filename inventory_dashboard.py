@@ -63,6 +63,16 @@ def get_region(city):
     else:
         return 'Not Known'
 
+# Normalize ops_status values
+def normalize_ops_status(status):
+    normalization_dict = {
+        'PILOT': 'PILOT',
+        'PILOT VEHICLES': 'PILOT',
+        'IOD': 'IOD',
+        'IOD VEHICLES': 'IOD'
+    }
+    return normalization_dict.get(status, status)
+
 # Main function to create the scorecard chart and other visualizations
 def main():
     # Universal filters
@@ -102,12 +112,15 @@ def main():
     data_columns, data_ops_status = fetch_data_from_supabase(['deployed_city', 'ops_status'], filters)
 
     if data_ops_status is not None:
+        # Normalize ops_status values
+        data_ops_status = [(row[0], normalize_ops_status(row[1])) for row in data_ops_status]
+
         # Filter based on selected regions
         if selected_regions:
             data_ops_status = [row for row in data_ops_status if get_region(row[data_columns.index('deployed_city')]) in selected_regions]
 
         # Calculate counts for 'rev gen' and 'non rev gen'
-        ops_status_list = [row[data_columns.index('ops_status')] for row in data_ops_status]
+        ops_status_list = [row[1] for row in data_ops_status]
         rev_gen_count = sum(1 for status in ops_status_list if status in ['RENTAL', 'PORTER'])
         non_rev_gen_count = len(ops_status_list) - rev_gen_count
         total_count = len(ops_status_list)
@@ -161,6 +174,9 @@ def main():
         data_columns, data_pivot = fetch_data_from_supabase(['deployed_city', 'ops_status'], filters)
 
         if data_pivot is not None:
+            # Normalize ops_status values
+            data_pivot = [(row[0], normalize_ops_status(row[1])) for row in data_pivot]
+
             # Filter based on selected regions
             if selected_regions:
                 data_pivot = [row for row in data_pivot if get_region(row[data_columns.index('deployed_city')]) in selected_regions]
@@ -206,3 +222,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
