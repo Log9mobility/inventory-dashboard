@@ -152,6 +152,14 @@ def main():
             st.write("## Revenue Generation and Non-Revenue Generation Counts")
             st.write(df_counts)
 
+        # Calculate %Utilization for each region
+        region_utilization = calculate_region_utilization(data_ops_status, selected_regions)
+
+        # Display the %Utilization for each region
+        st.write("## %Utilization by Region")
+        for region, utilization in region_utilization.items():
+            st.write(f"{region}: {utilization:.2f}%")
+
         # Display the pie chart for ops_status
         st.write("## Ops Status Pie Chart")
         ops_status_counts = pd.Series(ops_status_list).value_counts()
