@@ -177,19 +177,10 @@ def main():
         # Display the %Utilization and revenue generation count in two columns at the top of the page
         col1, col2 = st.columns([1, 1])
         with col1:
-            #st.write("## %Utilization")
-            #st.write(f"{utilization_percentage:.2f}%")
-            # Display the %Utilization for each region
-            #st.write("## %Utilization by Region")
-            
-            #st.markdown("<h2 style='font-size:20px;'>Regional Utilization</h2>", unsafe_allow_html=True)
-            #region_utilization_df = pd.DataFrame(list(region_utilization.items()), columns=['Region', '%Utilization'])
-            #st.write(region_utilization_df)
-            #st.write(region_utilization_df.to_html(index=False), unsafe_allow_html=True)
 
             st.markdown("<h2 style='font-size:20px;'>Regional Utilization</h2>", unsafe_allow_html=True)
             region_utilization_df = pd.DataFrame(list(region_utilization.items()), columns=['Region', '%Utilization'])
-            st.write(region_utilization_df)
+            st.write(region_utilization_df.to_html(index=False), unsafe_allow_html=True)
     
         with col2:
             #st.write("## Revenue Generation and Non-Revenue Generation Counts")
