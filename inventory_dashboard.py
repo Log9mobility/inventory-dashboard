@@ -182,7 +182,8 @@ def main():
             #st.write("## %Utilization")
             #st.write(f"{utilization_percentage:.2f}%")
             # Display the %Utilization for each region
-            st.write("## %Utilization by Region")
+            #st.write("## %Utilization by Region")
+            st.markdown("<h2 style='font-size:20px;'>%Utilization by Region</h2>", unsafe_allow_html=True)
             region_utilization_df = pd.DataFrame(list(region_utilization.items()), columns=['Region', '%Utilization'])
             st.write(region_utilization_df)
         with col2:
