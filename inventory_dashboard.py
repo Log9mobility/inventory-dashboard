@@ -170,8 +170,8 @@ def main():
 
         # Create DataFrame for rev_gen, non_rev_gen, and total counts
         df_counts = pd.DataFrame({
-            'Category': ['Rev Gen', 'Non Rev Gen', 'Total'],
-            'Count': [rev_gen_count, non_rev_gen_count, total_count]
+            'Category': ['Rev Gen', 'Non Rev Gen', 'Total','Utilization'],
+            'Count': [rev_gen_count, non_rev_gen_count, total_count,f"{utilization_percentage:.2f}%"]
         })
 
         # Display the %Utilization and revenue generation count in two columns at the top of the page
