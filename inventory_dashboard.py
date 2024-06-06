@@ -88,10 +88,11 @@ def calculate_region_utilization(data_ops_status, selected_regions):
         city = row[0]
         status = row[1]
         region = get_region(city)
-        if not selected_regions or region in selected_regions:
-            region_counts[region]['total'] += 1
-            if status in ['RENTAL', 'PORTER']:
-                region_counts[region]['rev_gen'] += 1
+        if region != 'Not Known':  # Exclude "Not Known" from calculations
+            if not selected_regions or region in selected_regions:
+                region_counts[region]['total'] += 1
+                if status in ['RENTAL', 'PORTER']:
+                    region_counts[region]['rev_gen'] += 1
 
     region_utilization = {}
     overall_rev_gen = 0
