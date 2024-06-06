@@ -183,8 +183,8 @@ def main():
             st.write(region_utilization_df.to_html(index=False), unsafe_allow_html=True)
     
         with col2:
-            #st.write("## Revenue Generation and Non-Revenue Generation Counts")
-            st.markdown("<h2 style='font-size:20px;'>Revenue Gen. vs Non Revenue Gen.</h2>", unsafe_allow_html=True)
+           
+            st.markdown("<h2 style='font-size:20px;'>Overall Utilization</h2>", unsafe_allow_html=True)
             #st.write(df_counts)
             st.write(df_counts.to_html(index=False), unsafe_allow_html=True)
 
