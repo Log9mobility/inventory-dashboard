@@ -195,8 +195,7 @@ def main():
         #st.write("## Ops Status Pie Chart")
         st.markdown("<h2 style='font-size:20px;'>Vehicles Status</h2>", unsafe_allow_html=True)
         ops_status_counts = pd.Series(ops_status_list).value_counts()
-        fig_ops_status = px.pie(ops_status_counts, values=ops_status_counts.values, names=ops_status_counts.index,
-                                title='Ops Status Distribution', hole=0.3)
+        fig_ops_status = px.pie(ops_status_counts, values=ops_status_counts.values, names=ops_status_counts.index, hole=0.3)
         fig_ops_status.update_traces(hoverinfo='label+percent')
         st.plotly_chart(fig_ops_status)
 
@@ -215,8 +214,7 @@ def main():
             # Display the pie chart for 'partner_id'
             #st.write("## Top 10 Partner ID Pie Chart")
             st.markdown("<h2 style='font-size:20px;'>Top 10 Customers</h2>", unsafe_allow_html=True)
-            fig_partner_id = px.pie(partner_id_counts, values=partner_id_counts.values, names=partner_id_counts.index,
-                                    title='Top 10 Partner ID Distribution', hole=0.3)
+            fig_partner_id = px.pie(partner_id_counts, values=partner_id_counts.values, names=partner_id_counts.index, hole=0.3)
             fig_partner_id.update_traces(hoverinfo='label+percent')
             st.plotly_chart(fig_partner_id)
 
