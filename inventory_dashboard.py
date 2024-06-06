@@ -103,11 +103,18 @@ def calculate_region_utilization(data_ops_status, selected_regions):
         rev_gen = counts['rev_gen']
         overall_rev_gen += rev_gen
         overall_total += total
-        utilization = (rev_gen / total * 100) if total > 0 else 0
-        region_utilization[region] = f"{utilization:.2f}%"
+        if total != 0:  # Ensure not dividing by zero
+            utilization = (rev_gen / total * 100)
+        else:
+            utilization = None  # Set utilization as None for "Not Known" region
+        if region != 'Not Known':
+            region_utilization[region] = f"{utilization:.2f}%" if utilization is not None else None
 
-    overall_utilization = (overall_rev_gen / overall_total * 100) if overall_total > 0 else 0
-    region_utilization['Overall'] = f"{overall_utilization:.2f}%"
+    if overall_total != 0:  # Ensure not dividing by zero
+        overall_utilization = (overall_rev_gen / overall_total * 100)
+    else:
+        overall_utilization = None  # Set overall_utilization as None if overall_total is zero
+    region_utilization['Overall'] = f"{overall_utilization:.2f}%" if overall_utilization is not None else None
 
     return region_utilization
 
