@@ -114,9 +114,8 @@ def calculate_region_utilization(data_ops_status, selected_regions):
         overall_utilization = (overall_rev_gen / overall_total * 100)
     else:
         overall_utilization = None  # Set overall_utilization as None if overall_total is zero
-    region_utilization['Overall'] = f"{overall_utilization:.2f}%" if overall_utilization is not None else None
 
-    return region_utilization
+    return region_utilization, overall_utilization
 
 def main():
     # Universal filters
@@ -176,7 +175,8 @@ def main():
         utilization_percentage = (rev_gen_count / total_count) * 100 if total_count != 0 else 0
 
         # Calculate %Utilization for each region
-        region_utilization = calculate_region_utilization(data_ops_status, selected_regions)
+        #region_utilization = calculate_region_utilization(data_ops_status, selected_regions)
+        region_utilization, overall_utilization = calculate_region_utilization(data_ops_status, selected_regions)
 
         # Create DataFrame for rev_gen, non_rev_gen, and total counts
         df_counts = pd.DataFrame({
@@ -191,10 +191,19 @@ def main():
             #st.write(f"{utilization_percentage:.2f}%")
             # Display the %Utilization for each region
             #st.write("## %Utilization by Region")
+            
+            #st.markdown("<h2 style='font-size:20px;'>Regional Utilization</h2>", unsafe_allow_html=True)
+            #region_utilization_df = pd.DataFrame(list(region_utilization.items()), columns=['Region', '%Utilization'])
+            #st.write(region_utilization_df)
+            #st.write(region_utilization_df.to_html(index=False), unsafe_allow_html=True)
+
             st.markdown("<h2 style='font-size:20px;'>Regional Utilization</h2>", unsafe_allow_html=True)
             region_utilization_df = pd.DataFrame(list(region_utilization.items()), columns=['Region', '%Utilization'])
-            #st.write(region_utilization_df)
             st.write(region_utilization_df.to_html(index=False), unsafe_allow_html=True)
+
+            # Display the overall %Utilization
+            overall_utilization_str = f"{overall_utilization:.2f}%" if overall_utilization is not None else None
+            st.write(f"Overall % Utilization: {overall_utilization_str}")
         with col2:
             #st.write("## Revenue Generation and Non-Revenue Generation Counts")
             st.markdown("<h2 style='font-size:20px;'>Revenue Gen. vs Non Revenue Gen.</h2>", unsafe_allow_html=True)
