@@ -185,11 +185,13 @@ def main():
             #st.write("## %Utilization by Region")
             st.markdown("<h2 style='font-size:20px;'>Regional Utilization</h2>", unsafe_allow_html=True)
             region_utilization_df = pd.DataFrame(list(region_utilization.items()), columns=['Region', '%Utilization'])
-            st.write(region_utilization_df)
+            #st.write(region_utilization_df)
+            st.write(region_utilization_df.to_html(index=False), unsafe_allow_html=True)
         with col2:
             #st.write("## Revenue Generation and Non-Revenue Generation Counts")
             st.markdown("<h2 style='font-size:20px;'>Revenue Gen. vs Non Revenue Gen.</h2>", unsafe_allow_html=True)
-            st.write(df_counts)
+            #st.write(df_counts)
+            st.write(df_counts.to_html(index=False), unsafe_allow_html=True)
 
         # Display the pie chart for ops_status
         #st.write("## Ops Status Pie Chart")
@@ -255,7 +257,7 @@ def main():
             partner_id_count_table = df_partner_id_count.groupby('partner_id')['deployed_city'].value_counts().unstack(fill_value=0)
             # Display partner_id count table
             #st.write("## Table: Count of Deployed Cities Across Partner IDs")
-            st.markdown("<h2 style='font-size:20px;'>Customer & Citywise Depl0yments</h2>", unsafe_allow_html=True)
+            st.markdown("<h2 style='font-size:20px;'>Customer & Citywise Deployments</h2>", unsafe_allow_html=True)
             st.write(partner_id_count_table)
 
         # Fetch data for deployed assets table
