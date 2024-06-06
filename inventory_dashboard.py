@@ -203,7 +203,7 @@ def main():
 
             # Display the overall %Utilization
             overall_utilization_str = f"{overall_utilization:.2f}%" if overall_utilization is not None else None
-            st.write(f"Overall % Utilization: {overall_utilization_str}")
+            st.write(overall_utilization_str.to_html(index=False), unsafe_allow_html=True)
         with col2:
             #st.write("## Revenue Generation and Non-Revenue Generation Counts")
             st.markdown("<h2 style='font-size:20px;'>Revenue Gen. vs Non Revenue Gen.</h2>", unsafe_allow_html=True)
