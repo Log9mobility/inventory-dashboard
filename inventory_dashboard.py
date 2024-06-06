@@ -183,15 +183,17 @@ def main():
             #st.write(f"{utilization_percentage:.2f}%")
             # Display the %Utilization for each region
             #st.write("## %Utilization by Region")
-            st.markdown("<h2 style='font-size:20px;'>%Utilization by Region</h2>", unsafe_allow_html=True)
+            st.markdown("<h2 style='font-size:20px;'>Regional Utilization</h2>", unsafe_allow_html=True)
             region_utilization_df = pd.DataFrame(list(region_utilization.items()), columns=['Region', '%Utilization'])
             st.write(region_utilization_df)
         with col2:
-            st.write("## Revenue Generation and Non-Revenue Generation Counts")
+            #st.write("## Revenue Generation and Non-Revenue Generation Counts")
+            st.markdown("<h2 style='font-size:20px;'>Revenue Gen. vs Non Revenue Gen.</h2>", unsafe_allow_html=True)
             st.write(df_counts)
 
         # Display the pie chart for ops_status
-        st.write("## Ops Status Pie Chart")
+        #st.write("## Ops Status Pie Chart")
+        st.markdown("<h2 style='font-size:20px;'>Vehicles Status</h2>", unsafe_allow_html=True)
         ops_status_counts = pd.Series(ops_status_list).value_counts()
         fig_ops_status = px.pie(ops_status_counts, values=ops_status_counts.values, names=ops_status_counts.index,
                                 title='Ops Status Distribution', hole=0.3)
@@ -211,7 +213,8 @@ def main():
             partner_id_counts = pd.Series(partner_id_list).value_counts().head(10)
 
             # Display the pie chart for 'partner_id'
-            st.write("## Top 10 Partner ID Pie Chart")
+            #st.write("## Top 10 Partner ID Pie Chart")
+            st.markdown("<h2 style='font-size:20px;'>Top 10 Customers</h2>", unsafe_allow_html=True)
             fig_partner_id = px.pie(partner_id_counts, values=partner_id_counts.values, names=partner_id_counts.index,
                                     title='Top 10 Partner ID Distribution', hole=0.3)
             fig_partner_id.update_traces(hoverinfo='label+percent')
@@ -236,7 +239,8 @@ def main():
             # Pivot table
             pivot_table = pd.pivot_table(df_pivot, index='deployed_city', columns='ops_status', aggfunc='size', fill_value=0)
             # Display pivot table
-            st.write("## Pivot Table: Count of Ops Status Across Deployed Cities")
+            #st.write("## Pivot Table: Count of Ops Status Across Deployed Cities")
+            st.markdown("<h2 style='font-size:20px;'>Citywise Vehicles Status</h2>", unsafe_allow_html=True)
             st.write(pivot_table)
 
         # Fetch data for partner_id count table
@@ -252,7 +256,8 @@ def main():
             # Group by partner_id and count deployed_city
             partner_id_count_table = df_partner_id_count.groupby('partner_id')['deployed_city'].value_counts().unstack(fill_value=0)
             # Display partner_id count table
-            st.write("## Table: Count of Deployed Cities Across Partner IDs")
+            #st.write("## Table: Count of Deployed Cities Across Partner IDs")
+            st.markdown("<h2 style='font-size:20px;'>Customer & Citywise Depl0yments</h2>", unsafe_allow_html=True)
             st.write(partner_id_count_table)
 
         # Fetch data for deployed assets table
@@ -273,7 +278,8 @@ def main():
             df_deployed_assets = pd.DataFrame(data_deployed_assets, columns=['deployed_city', 'chassis_number', 'partner_id', 'battery_capacity', 'ops_status'])
             
             # Display the table
-            st.write("## Table: Deployed Assets Information")
+            #st.write("## Table: Deployed Assets Information")
+            st.markdown("<h2 style='font-size:20px;'>Vehicle Details</h2>", unsafe_allow_html=True)
             st.write(df_deployed_assets)
 
 if __name__ == "__main__":
